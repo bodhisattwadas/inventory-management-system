@@ -18,6 +18,10 @@
     RewriteCond public/$1 -d
     RewriteRule ^(.*)$ public/$1 [L]
 
+    # Serve Laravel public-disk uploads when storage:link is unavailable on shared hosting.
+    RewriteCond storage/app/public/$1 -f
+    RewriteRule ^storage/(.*)$ storage/app/public/$1 [L]
+
     # Keep sensitive project files out of web access when the document root is this directory.
     RewriteRule (^|/)\. - [F,L]
     RewriteRule ^(app|bootstrap|config|database|resources|routes|storage|tests|vendor)(/|$) - [F,L]
