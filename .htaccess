@@ -20,7 +20,7 @@
 
     # Serve Laravel public-disk uploads when storage:link is unavailable on shared hosting.
     RewriteCond storage/app/public/$1 -f
-    RewriteRule ^storage/(.*)$ storage/app/public/$1 [L]
+    RewriteRule ^storage/(.*)$ storage/app/public/$1 [END]
 
     # Keep sensitive project files out of web access when the document root is this directory.
     RewriteRule (^|/)\. - [F,L]
