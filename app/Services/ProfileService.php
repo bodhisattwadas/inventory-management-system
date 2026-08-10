@@ -40,12 +40,18 @@ class ProfileService
 
                 $oldPhotoPath = $user->profile_photo_path;
 
-                $user->update([
+                $updates = [
                     'name' => $data['name'],
                     'username' => $data['username'],
                     'email' => $data['email'],
                     'profile_photo_path' => $data['profile_photo_path'] ?? $user->profile_photo_path,
-                ]);
+                ];
+
+                if ($user->email !== $data['email']) {
+                    $updates['email_verified_at'] = null;
+                }
+
+                $user->update($updates);
 
                 if (! empty($data['profile_photo_path']) && $oldPhotoPath && $oldPhotoPath !== $data['profile_photo_path']) {
                     Storage::disk('public')->delete($oldPhotoPath);
