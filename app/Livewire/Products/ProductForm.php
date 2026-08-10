@@ -8,12 +8,16 @@ use Livewire\Component;
 use App\Models\Category;
 use App\Models\Unit;
 use Livewire\Attributes\On;
+use Livewire\WithFileUploads;
 use Illuminate\Validation\Rule;
 use App\Services\ProductService;
 use App\Exceptions\ProductException;
+use Illuminate\Support\Facades\Storage;
 
 class ProductForm extends Component
 {
+    use WithFileUploads;
+
     public bool $isEditing = false;
     public ?Product $product = null;
 
@@ -29,6 +33,8 @@ class ProductForm extends Component
     public bool $is_active = true;
     public string $description = '';
     public string $notes = '';
+    public $image = null;
+    public ?string $currentImagePath = null;
 
     // Select Options (Removed for AJAX)
     public ?string $categoryName = null;
@@ -47,7 +53,7 @@ class ProductForm extends Component
     #[On('create-product')]
     public function create(): void
     {
-        $this->reset(['sku', 'name', 'category_id', 'unit_id', 'purchase_price', 'selling_price', 'quantity', 'min_stock', 'description', 'notes', 'product', 'isEditing', 'categoryName', 'unitName']);
+        $this->reset(['sku', 'name', 'category_id', 'unit_id', 'purchase_price', 'selling_price', 'quantity', 'min_stock', 'description', 'notes', 'image', 'currentImagePath', 'product', 'isEditing', 'categoryName', 'unitName']);
         $this->is_active = true;
 
         $this->dispatch('open-modal', name: 'product-form-modal');
@@ -68,6 +74,8 @@ class ProductForm extends Component
         $this->is_active = $product->is_active;
         $this->description = $product->description ?? '';
         $this->notes = $product->notes ?? '';
+        $this->image = null;
+        $this->currentImagePath = $product->image_path;
 
         // Set initial labels for TomSelect
         $this->categoryName = $product->category ? $product->category->name : null;
@@ -97,12 +105,16 @@ class ProductForm extends Component
             'is_active' => ['boolean'],
             'description' => ['nullable', 'string'],
             'notes' => ['nullable', 'string'],
+            'image' => ['nullable', 'image', 'max:2048'],
         ];
     }
 
     public function save(ProductService $service): void
     {
         $validated = $this->validate();
+        $validated['image_path'] = $this->image
+            ? $this->image->store('products', 'public')
+            : null;
 
         $data = ProductData::fromArray($validated);
 
@@ -119,9 +131,18 @@ class ProductForm extends Component
             $this->dispatch('pg:eventRefresh-product-table');
             $this->dispatch('toast', message: $message, type: 'success');
         } catch (ProductException $e) {
+            $this->deleteUploadedImage($validated['image_path']);
             $this->dispatch('toast', message: $e->getMessage(), type: 'error');
         } catch (\Throwable $e) {
+            $this->deleteUploadedImage($validated['image_path']);
             $this->dispatch('toast', message: 'An unexpected error occurred.', type: 'error');
+        }
+    }
+
+    private function deleteUploadedImage(?string $path): void
+    {
+        if ($path) {
+            Storage::disk('public')->delete($path);
         }
     }
 }

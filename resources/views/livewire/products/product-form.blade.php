@@ -12,6 +12,35 @@
 
         <form wire:submit="save" class="space-y-6">
 
+            <div class="space-y-2">
+                <x-input-label for="image" value="Product Image" />
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
+                    <div class="h-24 w-24 overflow-hidden rounded-md border border-gray-200 bg-gray-50">
+                        @if($image)
+                            <img src="{{ $image->temporaryUrl() }}" alt="Product image preview" class="h-full w-full object-cover">
+                        @elseif($currentImagePath)
+                            <img src="{{ Storage::url($currentImagePath) }}" alt="Current product image" class="h-full w-full object-cover">
+                        @else
+                            <div class="flex h-full w-full items-center justify-center text-xs text-gray-400">
+                                No image
+                            </div>
+                        @endif
+                    </div>
+                    <div class="flex-1 space-y-2">
+                        <input
+                            id="image"
+                            type="file"
+                            wire:model="image"
+                            accept="image/png,image/jpeg,image/webp"
+                            class="block w-full text-sm text-gray-700 file:mr-4 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-foreground hover:file:bg-primary/90"
+                        >
+                        <p class="text-xs text-muted-foreground">PNG, JPG, or WEBP up to 2 MB.</p>
+                        <div wire:loading wire:target="image" class="text-xs text-muted-foreground">Uploading image...</div>
+                        <x-input-error :messages="$errors->get('image')" />
+                    </div>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- SKU -->
                 @if($isEditing)

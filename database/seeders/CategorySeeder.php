@@ -12,28 +12,36 @@ class CategorySeeder extends Seeder
     {
         $categories = [
             [
-                'name' => 'Material Dasar',
-                'description' => 'Bahan bangunan utama seperti pasir, semen, batu, bata, hebel, dan besi beton.'
+                'name' => 'Face Makeup',
+                'description' => 'Foundations, concealers, primers, powders, blush, and contour products.'
             ],
             [
-                'name' => 'Kayu & Atap',
-                'description' => 'Material kayu, triplek, kaso, serta penutup atap seperti genteng, asbes, seng, dan terpal.'
+                'name' => 'Eye Makeup',
+                'description' => 'Mascara, eyeliner, eyebrow products, eyeshadow palettes, and eye primers.'
             ],
             [
-                'name' => 'Cat & Finishing',
-                'description' => 'Segala jenis cat (tembok/kayu/besi), thinner, pelapis anti bocor (no drop), dan lem.'
+                'name' => 'Lip Makeup',
+                'description' => 'Lipstick, gloss, liner, balm, tint, and lip care products.'
             ],
             [
-                'name' => 'Lantai & Dinding',
-                'description' => 'Penutup lantai dan dinding termasuk keramik, granit, plint, dan lis profil (kuku macan).'
+                'name' => 'Skin Care',
+                'description' => 'Cleansers, toners, serums, moisturizers, sunscreen, masks, and treatments.'
             ],
             [
-                'name' => 'Pipa & Listrik',
-                'description' => 'Instalasi air (pipa PVC, kran, toren) dan instalasi listrik (kabel, lampu, saklar).'
+                'name' => 'Hair Care',
+                'description' => 'Shampoo, conditioner, oils, masks, styling cream, and scalp care.'
             ],
             [
-                'name' => 'Paku & Alat',
-                'description' => 'Barang kecil/receh seperti paku, baut, sekrup, engsel, gembok, dan peralatan tukang.'
+                'name' => 'Fragrance',
+                'description' => 'Perfume, body mist, roll-ons, and travel fragrance.'
+            ],
+            [
+                'name' => 'Tools & Accessories',
+                'description' => 'Brushes, sponges, applicators, mirrors, pouches, and cosmetic tools.'
+            ],
+            [
+                'name' => 'Body Care',
+                'description' => 'Body lotion, scrubs, shower gel, hand cream, and deodorant.'
             ],
         ];
 

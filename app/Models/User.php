@@ -25,6 +25,8 @@ class User extends Authenticatable
         'name',
         'username',
         'email',
+        'role',
+        'profile_photo_path',
         'password',
     ];
 
@@ -54,5 +56,10 @@ class User extends Authenticatable
     public function sales()
     {
         return $this->hasMany(Sale::class, 'created_by');
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
     }
 }

@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use App\DTOs\ProductData;
 use App\Exceptions\ProductException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ProductService
 {
@@ -32,6 +33,7 @@ class ProductService
                     'is_active' => $data->is_active,
                     'description' => $data->description,
                     'notes' => $data->notes,
+                    'image_path' => $data->image_path,
                 ]);
 
             } catch (Exception $e) {
@@ -50,6 +52,8 @@ class ProductService
     {
         return DB::transaction(function () use ($product, $data) {
             try {
+                $oldImagePath = $product->image_path;
+
                 $product->update([
                     'category_id' => $data->category_id,
                     'unit_id' => $data->unit_id,
@@ -62,7 +66,12 @@ class ProductService
                     'is_active' => $data->is_active,
                     'description' => $data->description,
                     'notes' => $data->notes,
+                    'image_path' => $data->image_path ?? $product->image_path,
                 ]);
+
+                if ($data->image_path && $oldImagePath && $oldImagePath !== $data->image_path) {
+                    Storage::disk('public')->delete($oldImagePath);
+                }
 
                 return $product->refresh();
 
@@ -86,7 +95,13 @@ class ProductService
                     throw new Exception('Cannot delete product because it is associated with purchase or sale records.');
                 }
 
+                $imagePath = $product->image_path;
+
                 $product->delete();
+
+                if ($imagePath) {
+                    Storage::disk('public')->delete($imagePath);
+                }
 
             } catch (Exception $e) {
                 throw ProductException::deletionFailed($e->getMessage(), ['id' => $product->id]);

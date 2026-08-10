@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Services\ProductService;
 use App\Exceptions\ProductException;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Storage;
 use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Facades\Filter;
@@ -56,6 +57,14 @@ final class ProductTable extends PowerGridComponent
         return PowerGrid::fields()
             ->add('id')
             ->add('sku')
+            ->add('image_path')
+            ->add('image_preview', function (Product $model) {
+                if (! $model->image_path) {
+                    return '<div class="h-10 w-10 rounded-md border border-gray-200 bg-gray-50 flex items-center justify-center text-xs text-gray-400">-</div>';
+                }
+
+                return '<img src="' . e(Storage::url($model->image_path)) . '" alt="' . e($model->name) . '" class="h-10 w-10 rounded-md border border-gray-200 object-cover">';
+            })
             ->add('name')
             ->add('name_formatted', function (Product $model) {
                 return $model->is_active ? $model->name : '(DISCONTINUE) ' . $model->name;
@@ -98,6 +107,13 @@ final class ProductTable extends PowerGridComponent
 
             Column::make('SKU', 'sku')
                 ->searchable(),
+
+            Column::make('Image', 'image_preview')
+                ->visibleInExport(false),
+
+            Column::make('Image Path', 'image_path')
+                ->hidden()
+                ->visibleInExport(true),
 
             Column::make('Name', 'name_formatted', 'name')
                 ->sortable()

@@ -11,16 +11,14 @@ class UnitSeeder extends Seeder
     public function run(): void
     {
         $units = [
-            ['name' => 'Pcs', 'symbol' => 'pcs'],       // Satuan umum (Alat, Sambungan Pipa, Kuas)
-            ['name' => 'Kilogram', 'symbol' => 'kg'],  // Paku, Kawat, Cat Kiloan
-            ['name' => 'Meter', 'symbol' => 'm'],      // Kabel, Talang, Plastik Cor
-            ['name' => 'Batang', 'symbol' => 'btg'],  // Pipa, Besi Beton, Baja Ringan, Lis
-            ['name' => 'Lembar', 'symbol' => 'lbr'],   // Triplek, Seng, Asbes, GRC
-            ['name' => 'Sak', 'symbol' => 'sak'],      // Khusus Semen
-            ['name' => 'Dus', 'symbol' => 'dus'],      // Keramik, Granit, Paku (Grosir)
-            ['name' => 'Roll', 'symbol' => 'roll'],    // Kabel Besar, Selang, Terpal Gulung
-            ['name' => 'Rit', 'symbol' => 'rit'],      // Pasir, Batu (Muatan Truk)
-            ['name' => 'Liter', 'symbol' => 'ltr'],    // Thinner, Cat Minyak
+            ['name' => 'Piece', 'symbol' => 'pcs'],
+            ['name' => 'Bottle', 'symbol' => 'btl'],
+            ['name' => 'Tube', 'symbol' => 'tube'],
+            ['name' => 'Jar', 'symbol' => 'jar'],
+            ['name' => 'Palette', 'symbol' => 'plt'],
+            ['name' => 'Box', 'symbol' => 'box'],
+            ['name' => 'Set', 'symbol' => 'set'],
+            ['name' => 'Sachet', 'symbol' => 'sct'],
         ];
 
         foreach ($units as $unit) {

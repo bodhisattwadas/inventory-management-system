@@ -8,6 +8,8 @@ class UserData
         public readonly string $name,
         public readonly string $username,
         public readonly string $email,
+        public readonly string $role = 'staff',
+        public readonly ?string $profile_photo_path = null,
         public readonly ?string $password = null,
     ) {}
 
@@ -17,6 +19,8 @@ class UserData
             name: $data['name'],
             username: $data['username'],
             email: $data['email'],
+            role: $data['role'] ?? 'staff',
+            profile_photo_path: $data['profile_photo_path'] ?? null,
             password: $data['password'] ?? null,
         );
     }
@@ -27,6 +31,8 @@ class UserData
             'name' => $this->name,
             'username' => $this->username,
             'email' => $this->email,
+            'role' => $this->role,
+            'profile_photo_path' => $this->profile_photo_path,
             'password' => $this->password,
         ];
     }

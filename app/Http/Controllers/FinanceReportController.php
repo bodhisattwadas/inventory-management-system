@@ -71,6 +71,7 @@ class FinanceReportController extends Controller
         $storeName = Setting::get('store_name', 'My Store');
         $storeAddress = Setting::get('store_address', 'Store Address');
         $storePhone = Setting::get('store_phone', '-');
+        $storeEmail = Setting::get('store_email', '-');
 
         // Determine Period Label
         $periodKey = $request->input('period');
@@ -80,22 +81,22 @@ class FinanceReportController extends Controller
             $now = Carbon::now();
             switch ($periodKey) {
                 case 'today':
-                    $periodText = 'Today (' . $now->translatedFormat('d F Y') . ')';
+                    $periodText = 'Today (' . $now->format('d F Y') . ')';
                     break;
                 case 'yesterday':
-                    $periodText = 'Yesterday (' . $now->subDay()->translatedFormat('d F Y') . ')';
+                    $periodText = 'Yesterday (' . $now->subDay()->format('d F Y') . ')';
                     break;
                 case 'this_week':
-                    $periodText = 'This Week (' . $now->startOfWeek()->translatedFormat('d M') . ' - ' . $now->endOfWeek()->translatedFormat('d M Y') . ')';
+                    $periodText = 'This Week (' . $now->startOfWeek()->format('d M') . ' - ' . $now->endOfWeek()->format('d M Y') . ')';
                     break;
                 case 'last_week':
-                    $periodText = 'Last Week (' . $now->subWeek()->startOfWeek()->translatedFormat('d M') . ' - ' . $now->subWeek()->endOfWeek()->translatedFormat('d M Y') . ')';
+                    $periodText = 'Last Week (' . $now->subWeek()->startOfWeek()->format('d M') . ' - ' . $now->subWeek()->endOfWeek()->format('d M Y') . ')';
                     break;
                 case 'this_month':
-                    $periodText = 'This Month (' . $now->translatedFormat('F Y') . ')';
+                    $periodText = 'This Month (' . $now->format('F Y') . ')';
                     break;
                 case 'last_month':
-                    $periodText = 'Last Month (' . $now->subMonth()->translatedFormat('F Y') . ')';
+                    $periodText = 'Last Month (' . $now->subMonth()->format('F Y') . ')';
                     break;
             }
         }
@@ -106,9 +107,9 @@ class FinanceReportController extends Controller
             $end = $cashFlows->last()->transaction_date;
 
             if ($start->isSameDay($end)) {
-                $periodText = $start->translatedFormat('d F Y');
+                $periodText = $start->format('d F Y');
             } else {
-                $periodText = $start->translatedFormat('d M Y') . ' — ' . $end->translatedFormat('d M Y');
+                $periodText = $start->format('d M Y') . ' - ' . $end->format('d M Y');
             }
         }
 
@@ -122,6 +123,7 @@ class FinanceReportController extends Controller
             'storeName',
             'storeAddress',
             'storePhone',
+            'storeEmail',
             'periodText'
         ));
     }

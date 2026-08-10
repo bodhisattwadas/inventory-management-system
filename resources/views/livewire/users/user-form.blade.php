@@ -1,16 +1,49 @@
 <x-modal name="user-form-modal" :title="''" maxWidth="2xl">
     <div class="p-6">
         <!-- Custom Header -->
-        <div class="mb-6 space-y-1.5 text-center sm:text-left border-b border-gray-200 pb-4">
-            <h3 class="text-lg font-semibold leading-none tracking-tight text-foreground">
-                {{ $isEditing ? 'Edit User' : 'Create User' }}
-            </h3>
-            <p class="text-sm text-muted-foreground">
-                {{ $isEditing ? 'Update user information.' : 'Add a new user to the system.' }}
-            </p>
+        <div class="mb-6 flex items-start justify-between gap-4 border-b border-gray-200 pb-4">
+            <div class="space-y-1.5 text-center sm:text-left">
+                <h3 class="text-lg font-semibold leading-none tracking-tight text-foreground">
+                    {{ $isEditing ? 'Edit User' : 'Create User' }}
+                </h3>
+                <p class="text-sm text-muted-foreground">
+                    {{ $isEditing ? 'Update user information.' : 'Add a new user to the system.' }}
+                </p>
+            </div>
+            <button
+                type="button"
+                class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                x-on:click="$dispatch('close')"
+                aria-label="{{ __('Close') }}"
+            >
+                <x-heroicon-o-x-mark class="h-4 w-4" />
+            </button>
         </div>
 
         <form wire:submit="save" class="space-y-4">
+            <div class="space-y-2">
+                <x-input-label for="profile_photo" :value="__('Profile Photo')" />
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
+                    <x-avatar
+                        :name="$name ?: 'User'"
+                        :src="$profile_photo ? $profile_photo->temporaryUrl() : ($currentProfilePhotoPath ? Storage::url($currentProfilePhotoPath) : null)"
+                        class="h-20 w-20"
+                    />
+                    <div class="flex-1 space-y-2">
+                        <input
+                            id="profile_photo"
+                            type="file"
+                            wire:model="profile_photo"
+                            accept="image/png,image/jpeg,image/webp"
+                            class="block w-full text-sm text-gray-700 file:mr-4 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-foreground hover:file:bg-primary/90"
+                        >
+                        <p class="text-xs text-muted-foreground">PNG, JPG, or WEBP up to 2 MB.</p>
+                        <div wire:loading wire:target="profile_photo" class="text-xs text-muted-foreground">Uploading photo...</div>
+                        <x-input-error :messages="$errors->get('profile_photo')" />
+                    </div>
+                </div>
+            </div>
+
             <!-- Name -->
             <x-form-input
                 name="name"
@@ -40,6 +73,21 @@
                 required
                 placeholder="email@example.com"
             />
+
+            <div class="space-y-2">
+                <x-input-label for="role" :value="__('Role')" required />
+                <select
+                    id="role"
+                    wire:model="role"
+                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    required
+                >
+                    @foreach($roles as $value => $label)
+                        <option value="{{ $value }}">{{ $label }}</option>
+                    @endforeach
+                </select>
+                <x-input-error :messages="$errors->get('role')" />
+            </div>
 
             <!-- Password -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -72,7 +120,7 @@
 
             <!-- Actions -->
             <div class="mt-6 flex justify-end gap-3 border-t border-gray-200 pt-4">
-                <x-secondary-button type="button" x-on:click="$dispatch('close-modal', { name: 'user-form-modal' })">
+                <x-secondary-button type="button" x-on:click="$dispatch('close')">
                     {{ __('Cancel') }}
                 </x-secondary-button>
 

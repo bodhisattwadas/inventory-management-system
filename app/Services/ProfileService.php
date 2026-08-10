@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Exception;
 
 class ProfileService
@@ -37,11 +38,18 @@ class ProfileService
                     throw new Exception('The username is already taken by another account.');
                 }
 
+                $oldPhotoPath = $user->profile_photo_path;
+
                 $user->update([
                     'name' => $data['name'],
                     'username' => $data['username'],
                     'email' => $data['email'],
+                    'profile_photo_path' => $data['profile_photo_path'] ?? $user->profile_photo_path,
                 ]);
+
+                if (! empty($data['profile_photo_path']) && $oldPhotoPath && $oldPhotoPath !== $data['profile_photo_path']) {
+                    Storage::disk('public')->delete($oldPhotoPath);
+                }
 
                 Log::info("User profile updated: {$user->id}");
 

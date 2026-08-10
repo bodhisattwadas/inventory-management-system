@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Laporan Arus Kas - {{ $storeName }}</title>
+    <title>Cash Flow Report - {{ $storeName }}</title>
     <style>
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; line-height: 1.5; color: #333; margin: 0; padding: 40px; }
         .header-container { border-bottom: 2px solid #444; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-start; }
@@ -59,7 +59,7 @@
 <body>
 
     <div class="no-print" style="text-align: right; margin-bottom: 20px;">
-        <button onclick="window.print()" class="btn-print">🖨️ Print Report</button>
+        <button onclick="window.print()" class="btn-print">Print Report</button>
     </div>
 
     <div class="header-container">
@@ -67,7 +67,10 @@
             <h1>{{ $storeName }}</h1>
             <p>{{ $storeAddress }}</p>
             @if($storePhone !== '-')
-                <p>Telp: {{ $storePhone }}</p>
+                <p>Phone: {{ $storePhone }}</p>
+            @endif
+            @if($storeEmail !== '-')
+                <p>Email: {{ $storeEmail }}</p>
             @endif
         </div>
         <div class="report-meta">
@@ -76,7 +79,7 @@
                 Period: {{ $periodText }}
             </div>
             <div class="meta-item">
-                Printed: {{ now()->setTimezone('Asia/Jakarta')->translatedFormat('d F Y, H:i') }}
+                Printed: {{ now()->setTimezone('Asia/Jakarta')->format('d F Y, H:i') }}
             </div>
             <div class="meta-item">By: {{ auth()->user()->name ?? 'Admin' }}</div>
         </div>

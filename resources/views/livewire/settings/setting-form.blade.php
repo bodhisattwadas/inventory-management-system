@@ -45,6 +45,14 @@
                         <option value=" ">Space ( )</option>
                         <option value="">None</option>
                     </select>
+                @elseif($key === 'store_email')
+                    <input
+                        type="email"
+                        id="value"
+                        wire:model="value"
+                        class="block w-full rounded-md border-input bg-background shadow-sm focus:border-ring focus:ring-ring sm:text-sm"
+                        placeholder="store@example.com"
+                    >
                 @elseif(in_array($key, ['store_address']))
                     <textarea
                         id="value"

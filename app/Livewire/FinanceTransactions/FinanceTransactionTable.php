@@ -232,7 +232,7 @@ final class FinanceTransactionTable extends PowerGridComponent
     {
         return [
             Button::add('print-selected')
-                ->slot('🖨️ Print Selected')
+                ->slot('Print Selected')
                 ->class('bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md font-medium text-sm')
                 ->dispatch('bulk-print', []),
         ];

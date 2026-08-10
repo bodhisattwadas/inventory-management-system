@@ -17,66 +17,66 @@ class FinanceCategorySeeder extends Seeder
         $categories = [
             // Income
             [
-                'name' => 'Penjualan Produk',
+                'name' => 'Product Sales',
                 'type' => FinanceCategoryType::Income,
-                'description' => 'Pendapatan langsung dari penjualan produk toko.',
+                'description' => 'Direct income from store product sales.',
             ],
             [
-                'name' => 'Layanan Jasa',
+                'name' => 'Service Revenue',
                 'type' => FinanceCategoryType::Income,
-                'description' => 'Pendapatan dari layanan jasa service atau konsultasi.',
+                'description' => 'Income from service work or consultation.',
             ],
             [
                 'name' => 'Investasi',
                 'type' => FinanceCategoryType::Income,
-                'description' => 'Dividen atau bunga dari investasi modal.',
+                'description' => 'Dividends or interest from capital investments.',
             ],
             [
-                'name' => 'Pendapatan Lain-lain',
+                'name' => 'Other Income',
                 'type' => FinanceCategoryType::Income,
-                'description' => 'Pendapatan di luar operasional utama.',
+                'description' => 'Income outside core operations.',
             ],
 
             // Expenses
             [
-                'name' => 'Gaji Karyawan',
+                'name' => 'Employee Salaries',
                 'type' => FinanceCategoryType::Expense,
-                'description' => 'Biaya gaji bulanan dan tunjangan karyawan.',
+                'description' => 'Monthly salary and employee allowance costs.',
             ],
             [
-                'name' => 'Sewa Gedung',
+                'name' => 'Building Rent',
                 'type' => FinanceCategoryType::Expense,
-                'description' => 'Biaya sewa toko atau gudang operasional.',
+                'description' => 'Store or operational warehouse rental costs.',
             ],
             [
-                'name' => 'Listrik & Air',
+                'name' => 'Electricity & Water',
                 'type' => FinanceCategoryType::Expense,
-                'description' => 'Tagihan utilitas bulanan.',
+                'description' => 'Monthly utility bills.',
             ],
             [
-                'name' => 'Internet & Telepon',
+                'name' => 'Internet & Phone',
                 'type' => FinanceCategoryType::Expense,
-                'description' => 'Biaya komunikasi dan koneksi internet.',
+                'description' => 'Communication and internet connection costs.',
             ],
             [
-                'name' => 'Pemasaran & Iklan',
+                'name' => 'Marketing & Advertising',
                 'type' => FinanceCategoryType::Expense,
-                'description' => 'Biaya promosi, iklan sosial media, dan cetak.',
+                'description' => 'Promotion, social media advertising, and print advertising costs.',
             ],
             [
-                'name' => 'Perawatan & Perbaikan',
+                'name' => 'Maintenance & Repairs',
                 'type' => FinanceCategoryType::Expense,
-                'description' => 'Biaya maintenance aset dan peralatan.',
+                'description' => 'Asset and equipment maintenance costs.',
             ],
             [
                 'name' => 'Transportasi & Logistik',
                 'type' => FinanceCategoryType::Expense,
-                'description' => 'Biaya bensin, pengiriman, dan perjalanan dinas.',
+                'description' => 'Fuel, delivery, and business travel costs.',
             ],
             [
-                'name' => 'Pembelian Stok',
+                'name' => 'Inventory Purchases',
                 'type' => FinanceCategoryType::Expense,
-                'description' => 'Biaya pembelian barang dagangan (HPP).',
+                'description' => 'Cost of merchandise inventory purchases.',
             ],
         ];
 

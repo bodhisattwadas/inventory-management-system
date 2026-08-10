@@ -8,17 +8,30 @@ use Livewire\Attributes\On;
 use App\DTOs\UserData;
 use App\Services\UserService;
 use Illuminate\Validation\Rule;
+use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\Storage;
 
 class UserForm extends Component
 {
+    use WithFileUploads;
+
     public ?User $user = null;
     public bool $isEditing = false;
 
     public $name;
     public $username;
     public $email;
+    public string $role = 'staff';
+    public $profile_photo = null;
+    public ?string $currentProfilePhotoPath = null;
     public $password;
     public $password_confirmation;
+
+    public array $roles = [
+        'admin' => 'Admin',
+        'manager' => 'Manager',
+        'staff' => 'Staff',
+    ];
 
     public function rules(): array
     {
@@ -26,21 +39,17 @@ class UserForm extends Component
             'name' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'max:255', Rule::unique('users', 'username')->ignore($this->user?->id)],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($this->user?->id)],
+            'role' => ['required', Rule::in(array_keys($this->roles))],
+            'profile_photo' => ['nullable', 'image', 'max:2048'],
             'password' => [$this->isEditing ? 'nullable' : 'required', 'string', 'min:8', 'confirmed'],
         ];
     }
 
-    #[On('open-modal')]
-    public function handleOpenModal($name): void
-    {
-        if ($name === 'user-form-modal' && !$this->isEditing) {
-            $this->create(); // Ensure we reset if opening for create
-        }
-    }
-
+    #[On('create-user')]
     public function create(): void
     {
-        $this->reset(['user', 'isEditing', 'name', 'username', 'email', 'password', 'password_confirmation']);
+        $this->reset(['user', 'isEditing', 'name', 'username', 'email', 'profile_photo', 'currentProfilePhotoPath', 'password', 'password_confirmation']);
+        $this->role = 'staff';
         $this->dispatch('open-modal', name: 'user-form-modal');
     }
 
@@ -53,6 +62,9 @@ class UserForm extends Component
         $this->name = $user->name;
         $this->username = $user->username;
         $this->email = $user->email;
+        $this->role = $user->role ?? 'staff';
+        $this->profile_photo = null;
+        $this->currentProfilePhotoPath = $user->profile_photo_path;
         $this->password = '';
         $this->password_confirmation = '';
 
@@ -61,12 +73,17 @@ class UserForm extends Component
 
     public function save(UserService $service): void
     {
-        $this->validate();
+        $validated = $this->validate();
+        $validated['profile_photo_path'] = $this->profile_photo
+            ? $this->profile_photo->store('profile-photos', 'public')
+            : null;
 
         $data = new UserData(
             name: $this->name,
             username: $this->username,
             email: $this->email,
+            role: $this->role,
+            profile_photo_path: $validated['profile_photo_path'],
             password: $this->password ?: null, // Pass null if empty in edit mode
         );
 
@@ -84,10 +101,19 @@ class UserForm extends Component
             $this->dispatch('toast', message: $message, type: 'success');
 
             // Reset after save
-            $this->reset(['user', 'isEditing', 'name', 'username', 'email', 'password', 'password_confirmation']);
+            $this->reset(['user', 'isEditing', 'name', 'username', 'email', 'profile_photo', 'currentProfilePhotoPath', 'password', 'password_confirmation']);
+            $this->role = 'staff';
 
         } catch (\Exception $e) {
+            $this->deleteUploadedPhoto($validated['profile_photo_path']);
             $this->dispatch('toast', message: 'Error: ' . $e->getMessage(), type: 'error');
+        }
+    }
+
+    private function deleteUploadedPhoto(?string $path): void
+    {
+        if ($path) {
+            Storage::disk('public')->delete($path);
         }
     }
 

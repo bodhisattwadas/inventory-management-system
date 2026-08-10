@@ -15,6 +15,7 @@ class SettingSeeder extends Seeder
         Setting::set('store_name', 'TB. Kencana Pamijahan');
         Setting::set('store_address', 'Pamijahan, Kec. Plumbon, Kabupaten Cirebon, Jawa Barat 45155');
         Setting::set('store_phone', '081234567890');
+        Setting::set('store_email', 'store@example.com');
         Setting::set('opening_balance_date', now()->startOfYear()->toDateString());
         Setting::set('opening_balance_amount', '10000000');
         Setting::set('currency_symbol', 'Rp');

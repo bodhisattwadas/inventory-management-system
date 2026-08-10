@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faktur #{{ $sale->invoice_number }}</title>
+    <title>Invoice #{{ $sale->invoice_number }}</title>
     <style>
         @media print {
             @page {
@@ -245,19 +245,22 @@
                 <div class="logo-box">TB</div>
                 <div class="company-info">
                     <div class="company-name">{{ \App\Models\Setting::get('store_name', config('app.name')) }}</div>
-                    <div class="company-desc">Menjual: Bahan Bangunan, Alat Teknik, Cat, Dll.</div>
+                    <div class="company-desc">Selling: cosmetics, beauty tools, skincare, and accessories.</div>
                     <div class="company-address">
                         {{ \App\Models\Setting::get('store_address', 'Jl. Default No. 1') }}<br>
-                        HP. {{ \App\Models\Setting::get('store_phone', '-') }}
+                        Phone: {{ \App\Models\Setting::get('store_phone', '-') }}
+                        @if(\App\Models\Setting::get('store_email'))
+                            <br>Email: {{ \App\Models\Setting::get('store_email') }}
+                        @endif
                     </div>
                 </div>
             </div>
             <div class="header-right">
                 <div class="header-row">
-                    <span>{{ $sale->sale_date->locale('id')->isoFormat('dddd, D MMMM Y') }}</span>
+                    <span>{{ $sale->sale_date->locale('en')->isoFormat('dddd, D MMMM Y') }}</span>
                 </div>
                 <div class="header-row">
-                    <span class="header-label">Kepada Yth,</span>
+                    <span class="header-label">Bill To,</span>
                     <span class="header-value">{{ $sale->customer->name ?? 'Guest' }}</span>
                 </div>
             </div>
@@ -265,7 +268,7 @@
 
         <!-- Invoice No Line -->
         <div class="invoice-row">
-            <span class="invoice-label">FAKTUR / BON / KONTAN No.</span>
+            <span class="invoice-label">INVOICE / CASH RECEIPT No.</span>
             <span class="invoice-value">{{ $sale->invoice_number }}</span>
         </div>
 
@@ -273,11 +276,11 @@
         <table>
             <thead>
                 <tr>
-                    <th class="col-name">Nama Barang</th>
+                    <th class="col-name">Item Name</th>
                     <th class="col-qty">Qty</th>
-                    <th class="col-price">Harga</th>
-                    <th class="col-disc">Diskon</th>
-                    <th class="col-total">Jumlah</th>
+                    <th class="col-price">Price</th>
+                    <th class="col-disc">Discount</th>
+                    <th class="col-total">Amount</th>
                 </tr>
             </thead>
             <tbody>
@@ -310,14 +313,14 @@
         <!-- Footer -->
         <div class="footer">
             <div class="footer-left">
-                <div>Tanda Terima</div>
+                <div>Received By</div>
                 <div class="signature-space"></div>
                 <div>( .................................... )</div>
             </div>
 
             <div class="footer-center">
                 <div class="disclaimer-box">
-                    Mohon diperiksa bahwa barang dalam keadaan baik pada waktu diterima, barang yang sudah dibeli tidak dapat dikembalikan
+                    Please check that all items are in good condition when received. Purchased items cannot be returned.
                 </div>
             </div>
 
@@ -328,7 +331,7 @@
                 </div>
                 @if($sale->global_discount > 0)
                 <div class="amount-row">
-                    <span class="amount-label">Diskon Extra</span>
+                    <span class="amount-label">Extra Discount</span>
                     <span class="amount-value">- @money($sale->global_discount)</span>
                 </div>
                 @endif
@@ -337,11 +340,11 @@
                     <span class="amount-value">@money($sale->total)</span>
                 </div>
                 <div class="amount-row">
-                    <span class="amount-label">Uang Diterima</span>
+                    <span class="amount-label">Amount Received</span>
                     <span class="amount-value">@money($sale->cash_received)</span>
                 </div>
                 <div class="amount-row">
-                    <span class="amount-label">Kembalian</span>
+                    <span class="amount-label">Change</span>
                     <span class="amount-value">@money($sale->change)</span>
                 </div>
             </div>

@@ -4,6 +4,7 @@ namespace App\Livewire\Users;
 
 use App\Models\User;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Builder;
 use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
@@ -47,9 +48,19 @@ final class UserTable extends PowerGridComponent
     {
         return PowerGrid::fields()
             ->add('id')
+            ->add('profile_photo_path')
+            ->add('avatar', function (User $model) {
+                if (! $model->profile_photo_path) {
+                    return '<div class="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center text-xs text-gray-500">' . e(strtoupper(substr($model->name, 0, 1))) . '</div>';
+                }
+
+                return '<img src="' . e(Storage::url($model->profile_photo_path)) . '" alt="' . e($model->name) . '" class="h-9 w-9 rounded-full object-cover">';
+            })
             ->add('name')
             ->add('username')
             ->add('email')
+            ->add('role')
+            ->add('role_label', fn (User $model) => ucfirst($model->role ?? 'staff'))
             ->add('created_at_formatted', fn (User $model) => Carbon::parse($model->created_at)->format('d/m/Y H:i'));
     }
 
@@ -60,6 +71,13 @@ final class UserTable extends PowerGridComponent
                 ->visibleInExport(true)
                 ->hidden(),
 
+            Column::make('Photo', 'avatar')
+                ->visibleInExport(false),
+
+            Column::make('Profile Photo Path', 'profile_photo_path')
+                ->hidden()
+                ->visibleInExport(true),
+
             Column::make('Name', 'name')
                 ->searchable()
                 ->sortable(),
@@ -69,6 +87,10 @@ final class UserTable extends PowerGridComponent
                 ->sortable(),
 
             Column::make('Email', 'email')
+                ->searchable()
+                ->sortable(),
+
+            Column::make('Role', 'role_label', 'role')
                 ->searchable()
                 ->sortable(),
 

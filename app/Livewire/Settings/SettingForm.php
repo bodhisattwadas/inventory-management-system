@@ -15,8 +15,15 @@ class SettingForm extends Component
 
     public function rules()
     {
+        $rules = ['nullable', 'string'];
+
+        if ($this->key === 'store_email') {
+            $rules[] = 'email';
+            $rules[] = 'max:255';
+        }
+
         return [
-            'value' => ['nullable', 'string'],
+            'value' => $rules,
         ];
     }
 

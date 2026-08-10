@@ -1,4 +1,4 @@
-@props(['name', 'class' => ''])
+@props(['name', 'src' => null, 'class' => ''])
 
 @php
     $initials = collect(explode(' ', $name))
@@ -10,7 +10,11 @@
 @endphp
 
 <div {{ $attributes->merge(['class' => 'relative flex shrink-0 overflow-hidden rounded-full h-9 w-9 items-center justify-center bg-muted ' . $class]) }}>
-    <span class="flex h-full w-full items-center justify-center rounded-full bg-muted font-medium text-muted-foreground">
-        {{ $initials }}
-    </span>
+    @if($src)
+        <img src="{{ $src }}" alt="{{ $name }}" class="h-full w-full object-cover">
+    @else
+        <span class="flex h-full w-full items-center justify-center rounded-full bg-muted font-medium text-muted-foreground">
+            {{ $initials }}
+        </span>
+    @endif
 </div>

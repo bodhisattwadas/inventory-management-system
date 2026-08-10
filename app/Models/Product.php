@@ -23,6 +23,7 @@ class Product extends Model
         'is_active',
         'description',
         'notes',
+        'image_path',
     ];
 
     protected $casts = [

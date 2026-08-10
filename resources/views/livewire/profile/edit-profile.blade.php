@@ -5,6 +5,29 @@
                 <p class="mt-1 text-sm text-muted-foreground">{{ __("Update your account's profile information and email address.") }}</p>
             </div>
 
+            <div class="space-y-2 md:col-span-2">
+                <x-input-label for="profile_photo" :value="__('Profile Photo')" />
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
+                    <x-avatar
+                        :name="$name"
+                        :src="$profile_photo ? $profile_photo->temporaryUrl() : ($currentProfilePhotoPath ? Storage::url($currentProfilePhotoPath) : null)"
+                        class="h-20 w-20"
+                    />
+                    <div class="flex-1 space-y-2">
+                        <input
+                            id="profile_photo"
+                            type="file"
+                            wire:model="profile_photo"
+                            accept="image/png,image/jpeg,image/webp"
+                            class="block w-full text-sm text-gray-700 file:mr-4 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-foreground hover:file:bg-primary/90"
+                        >
+                        <p class="text-xs text-muted-foreground">PNG, JPG, or WEBP up to 2 MB.</p>
+                        <div wire:loading wire:target="profile_photo" class="text-xs text-muted-foreground">Uploading photo...</div>
+                        <x-input-error :messages="$errors->get('profile_photo')" />
+                    </div>
+                </div>
+            </div>
+
             <div class="space-y-2">
                 <x-input-label for="name" :value="__('Name')" required />
                 <x-text-input

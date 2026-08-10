@@ -14,6 +14,14 @@
             </div>
 
             <div class="space-y-6">
+                <div class="flex justify-center sm:justify-start">
+                    <x-avatar
+                        :name="$user->name"
+                        :src="$user->profile_photo_path ? Storage::url($user->profile_photo_path) : null"
+                        class="h-20 w-20"
+                    />
+                </div>
+
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div class="space-y-1">
                         <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('Name') }}</label>
@@ -32,6 +40,13 @@
                         <p class="text-sm text-foreground font-medium">{{ $user->email }}</p>
                     </div>
 
+                    <div class="space-y-1">
+                        <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('Role') }}</label>
+                        <p class="text-sm text-foreground font-medium">{{ ucfirst($user->role ?? 'staff') }}</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div class="space-y-1">
                         <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('Joined At') }}</label>
                         <p class="text-sm text-foreground font-medium">{{ $user->created_at->format('d M Y, H:i') }}</p>
