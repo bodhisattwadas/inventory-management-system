@@ -20,6 +20,21 @@
                             Dashboard
                         </a>
 
+                        <!-- Master Data Dropdown -->
+                        <x-nav-dropdown active="{{ request()->routeIs(['companies.*', 'master.companies.*']) }}">
+                            <x-slot name="icon">
+                                <x-heroicon-o-building-office-2 class="mr-2 h-4 w-4" />
+                            </x-slot>
+                            <x-slot name="trigger">
+                                Master Data
+                            </x-slot>
+                            <x-slot name="content">
+                                <x-dropdown-link :href="route('companies.index')" :active="request()->routeIs(['companies.*', 'master.companies.*'])">
+                                    Brands / Companies
+                                </x-dropdown-link>
+                            </x-slot>
+                        </x-nav-dropdown>
+
                         <!-- Sales Dropdown -->
                         <x-nav-dropdown active="{{ request()->routeIs(['sales.*', 'customers.*']) }}">
                             <x-slot name="icon">
@@ -42,7 +57,7 @@
                         </x-nav-dropdown>
 
                         <!-- Purchases Dropdown -->
-                        <x-nav-dropdown active="{{ request()->routeIs(['purchases.*', 'suppliers.*']) }}">
+                        <x-nav-dropdown active="{{ request()->routeIs(['purchases.*', 'suppliers.*', 'vendors.*', 'master.vendors.*']) }}">
                             <x-slot name="icon">
                                 <x-heroicon-o-shopping-cart class="mr-2 h-4 w-4" />
                             </x-slot>
@@ -55,6 +70,9 @@
                                 </x-dropdown-link>
                                 <x-dropdown-link :href="route('suppliers.index')" :active="request()->routeIs('suppliers.*')">
                                     Suppliers
+                                </x-dropdown-link>
+                                <x-dropdown-link :href="route('vendors.index')" :active="request()->routeIs(['vendors.*', 'master.vendors.*'])">
+                                    Suppliers / Vendors
                                 </x-dropdown-link>
                             </x-slot>
                         </x-nav-dropdown>
@@ -193,6 +211,19 @@
                     <div class="flex w-full flex-col gap-4">
                         <a href="{{ route('dashboard') }}" class="text-md font-semibold hover:underline {{ request()->routeIs('dashboard') ? 'text-primary' : '' }}">Dashboard</a>
 
+                        <!-- Mobile Master Data Accordion -->
+                        <div x-data="{ expanded: {{ request()->routeIs(['companies.*', 'master.companies.*']) ? 'true' : 'false' }} }" class="border-b-0">
+                            <button @click="expanded = !expanded" class="flex flex-1 items-center justify-between py-0 font-semibold transition-all hover:underline [&[data-state=open]>svg]:rotate-180 w-full text-left text-md {{ request()->routeIs(['companies.*', 'master.companies.*']) ? 'text-primary' : '' }}">
+                                Master Data
+                                <x-heroicon-o-chevron-down :class="{'rotate-180': expanded}" class="h-4 w-4 shrink-0 transition-transform duration-200" />
+                            </button>
+                            <div x-show="expanded" x-collapse>
+                                <div class="mt-2 flex flex-col gap-2 pl-4 border-l border-border ml-2">
+                                    <a class="text-sm font-medium hover:underline py-1 {{ request()->routeIs(['companies.*', 'master.companies.*']) ? 'text-primary' : '' }}" href="{{ route('companies.index') }}">Brands / Companies</a>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Mobile Sales Accordion -->
                         <div x-data="{ expanded: {{ request()->routeIs(['sales.*', 'customers.*']) ? 'true' : 'false' }} }" class="border-b-0">
                             <button @click="expanded = !expanded" class="flex flex-1 items-center justify-between py-0 font-semibold transition-all hover:underline [&[data-state=open]>svg]:rotate-180 w-full text-left text-md {{ request()->routeIs(['sales.*', 'customers.*']) ? 'text-primary' : '' }}">
@@ -209,8 +240,8 @@
                         </div>
 
                         <!-- Mobile Purchases Accordion -->
-                        <div x-data="{ expanded: {{ request()->routeIs(['purchases.*', 'suppliers.*']) ? 'true' : 'false' }} }" class="border-b-0">
-                            <button @click="expanded = !expanded" class="flex flex-1 items-center justify-between py-0 font-semibold transition-all hover:underline [&[data-state=open]>svg]:rotate-180 w-full text-left text-md {{ request()->routeIs(['purchases.*', 'suppliers.*']) ? 'text-primary' : '' }}">
+                        <div x-data="{ expanded: {{ request()->routeIs(['purchases.*', 'suppliers.*', 'vendors.*', 'master.vendors.*']) ? 'true' : 'false' }} }" class="border-b-0">
+                            <button @click="expanded = !expanded" class="flex flex-1 items-center justify-between py-0 font-semibold transition-all hover:underline [&[data-state=open]>svg]:rotate-180 w-full text-left text-md {{ request()->routeIs(['purchases.*', 'suppliers.*', 'vendors.*', 'master.vendors.*']) ? 'text-primary' : '' }}">
                                 Purchases
                                 <x-heroicon-o-chevron-down :class="{'rotate-180': expanded}" class="h-4 w-4 shrink-0 transition-transform duration-200" />
                             </button>
@@ -218,6 +249,7 @@
                                 <div class="mt-2 flex flex-col gap-2 pl-4 border-l border-border ml-2">
                                     <a class="text-sm font-medium hover:underline py-1 {{ request()->routeIs('purchases.index') ? 'text-primary' : '' }}" href="{{ route('purchases.index') }}">Purchases</a>
                                     <a class="text-sm font-medium hover:underline py-1 {{ request()->routeIs('suppliers.index') ? 'text-primary' : '' }}" href="{{ route('suppliers.index') }}">Suppliers</a>
+                                    <a class="text-sm font-medium hover:underline py-1 {{ request()->routeIs(['vendors.*', 'master.vendors.*']) ? 'text-primary' : '' }}" href="{{ route('vendors.index') }}">Suppliers / Vendors</a>
                                 </div>
                             </div>
                         </div>

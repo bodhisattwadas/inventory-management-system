@@ -15,6 +15,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::view('profile', 'profile.index')->name('profile.index');
+    Route::view('companies', 'companies.index')->name('companies.index');
+    Route::view('vendors', 'vendors.index')->name('vendors.index');
 
     // =========================================================================
     // Master Data
@@ -22,6 +24,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('master')->group(function () {
         Route::view('customers', 'customers.index')->name('customers.index');
         Route::view('suppliers', 'suppliers.index')->name('suppliers.index');
+        Route::view('companies', 'companies.index')->name('master.companies.index');
+        Route::view('vendors', 'vendors.index')->name('master.vendors.index');
         Route::view('categories', 'categories.index')->name('categories.index');
         Route::view('units', 'units.index')->name('units.index');
         Route::view('products', 'products.index')->name('products.index');
@@ -70,6 +74,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('ajax')->name('ajax.')->group(function () {
         Route::post('products', [\App\Http\Controllers\Api\ProductController::class, 'search'])->name('products.search');
         Route::post('suppliers', [\App\Http\Controllers\Api\SupplierController::class, 'search'])->name('suppliers.search');
+        Route::post('companies', [\App\Http\Controllers\Api\CompanyController::class, 'search'])->name('companies.search');
+        Route::post('vendors', [\App\Http\Controllers\Api\VendorController::class, 'search'])->name('vendors.search');
         Route::post('customers', [\App\Http\Controllers\Api\CustomerController::class, 'search'])->name('customers.search');
         Route::post('customers/store', [\App\Http\Controllers\Api\CustomerController::class, 'store'])->name('customers.store');
         Route::post('categories', [\App\Http\Controllers\Api\CategoryController::class, 'search'])->name('categories.search');
