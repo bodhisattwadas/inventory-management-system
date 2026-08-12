@@ -11,6 +11,12 @@ $maxWidthClasses = [
     'lg' => 'sm:max-w-lg',
     'xl' => 'sm:max-w-xl',
     '2xl' => 'sm:max-w-2xl',
+    '4xl' => 'sm:max-w-4xl',
+    '5xl' => 'sm:max-w-5xl',
+    '6xl' => 'sm:max-w-6xl',
+    '7xl' => 'sm:max-w-7xl',
+    'centered-form' => 'sm:max-w-2xl lg:max-w-3xl xl:max-w-[40vw]',
+    'inset-workspace' => 'sm:max-w-none sm:w-[80vw] sm:h-[80vh]',
 ];
 $maxWidth = $maxWidthClasses[$maxWidth] ?? $maxWidthClasses['2xl'];
 @endphp

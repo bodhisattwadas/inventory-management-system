@@ -41,7 +41,7 @@ final class SupplierTable extends PowerGridComponent
 
     public function datasource(): Builder
     {
-        return Supplier::query();
+        return Supplier::query()->with('companies');
     }
 
     public function fields(): PowerGridFields
@@ -52,6 +52,9 @@ final class SupplierTable extends PowerGridComponent
             ->add('contact_person')
             ->add('email')
             ->add('phone')
+            ->add('companies_list', fn (Supplier $supplier) => $supplier->companies->pluck('company_name')->join(', '))
+            ->add('bank_account', fn (Supplier $supplier) => $supplier->masked_account_number ?? '-')
+            ->add('status')
             ->add('address')
             ->add('created_at');
     }
@@ -79,12 +82,28 @@ final class SupplierTable extends PowerGridComponent
                 ->sortable()
                 ->searchable(),
 
+            Column::make('Brands / Companies', 'companies_list'),
+
+            Column::make('Bank Account', 'bank_account'),
+
+            Column::make('Status', 'status')
+                ->sortable()
+                ->searchable(),
+
             // Exports
             Column::make('Address', 'address')
                 ->hidden()
                 ->visibleInExport(true),
 
             Column::make('Notes', 'notes')
+                ->hidden()
+                ->visibleInExport(true),
+
+            Column::make('Bank Name', 'bank_name')
+                ->hidden()
+                ->visibleInExport(true),
+
+            Column::make('Bank Account Last 4', 'account_number_last4')
                 ->hidden()
                 ->visibleInExport(true),
 

@@ -1,10 +1,10 @@
-<x-app-layout title="Suppliers">
+<x-app-layout title="Suppliers / Vendors">
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-foreground leading-tight">
-                {{ __('Suppliers') }}
+                {{ __('Suppliers / Vendors') }}
             </h2>
-            <x-primary-button x-data x-on:click="$dispatch('create-supplier')">
+            <x-primary-button href="{{ route('suppliers.create') }}">
                 <x-heroicon-o-plus class="w-4 h-4 mr-2" />
                 {{ __('Create Supplier') }}
             </x-primary-button>

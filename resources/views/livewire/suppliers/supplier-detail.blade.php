@@ -1,67 +1,86 @@
 <x-modal name="supplier-detail-modal" focusable>
     @if($supplier)
-        <div class="p-6">
-            <!-- Header -->
+        <div class="p-6 max-h-[85vh] overflow-y-auto">
             <div class="mb-6 space-y-1.5 text-center sm:text-left border-b border-gray-200 pb-4">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-lg font-semibold leading-none tracking-tight text-foreground">
-                        {{ __('Supplier Details') }}
-                    </h3>
-                </div>
+                <h3 class="text-lg font-semibold leading-none tracking-tight text-foreground">
+                    {{ $supplier->name }}
+                </h3>
                 <p class="text-sm text-muted-foreground">
-                    {{ __('Detailed information about') }} {{ $supplier->name }}.
+                    {{ $supplier->legal_name ?: __('Supplier / Vendor Details') }}
                 </p>
             </div>
 
-                <div class="space-y-6">
-                    <div class="space-y-1">
-                        <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('Name') }}</label>
-                        <p class="text-sm text-foreground font-medium">{{ $supplier->name }}</p>
+            <div class="space-y-6">
+                <section>
+                    <h4 class="text-sm font-semibold mb-2">{{ __('Brands / Companies Supplied') }}</h4>
+                    <div class="flex flex-wrap gap-2">
+                        @forelse ($supplier->companies as $company)
+                            <span class="rounded bg-blue-50 px-2 py-1 text-xs text-blue-800">{{ $company->company_name }}</span>
+                        @empty
+                            <span class="text-sm text-gray-500">{{ __('No brands/companies assigned.') }}</span>
+                        @endforelse
                     </div>
+                </section>
 
-                    <div class="space-y-1">
-                        <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('Contact Person') }}</label>
-                        <p class="text-sm text-foreground font-medium">{{ $supplier->contact_person }}</p>
+                <section class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                        <label class="text-sm font-medium text-muted-foreground">{{ __('Contact Person') }}</label>
+                        <p class="text-sm font-medium">{{ $supplier->contact_person ?: '-' }}</p>
                     </div>
-
-                    <!-- Contact Info -->
-                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                        <div class="space-y-1">
-                            <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('Email') }}</label>
-                            <p class="text-sm text-foreground font-medium">{{ $supplier->email ?? '-' }}</p>
-                        </div>
-
-                        <div class="space-y-1">
-                            <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('Phone') }}</label>
-                            <p class="text-sm text-foreground font-medium">{{ $supplier->phone ?? '-' }}</p>
-                        </div>
+                    <div>
+                        <label class="text-sm font-medium text-muted-foreground">{{ __('Supplier Type') }}</label>
+                        <p class="text-sm font-medium">{{ $supplier->supplier_type ?: '-' }}</p>
                     </div>
-
-                    <div class="space-y-1">
-                        <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('Address') }}</label>
-                        <p class="text-sm text-foreground font-medium">{{ $supplier->address ?? '-' }}</p>
+                    <div>
+                        <label class="text-sm font-medium text-muted-foreground">{{ __('Email') }}</label>
+                        <p class="text-sm font-medium">{{ $supplier->email ?: '-' }}</p>
                     </div>
-
-                    <div class="space-y-1">
-                        <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('Notes') }}</label>
-                        <p class="text-sm text-foreground font-medium whitespace-pre-line">{{ $supplier->notes ?? '-' }}</p>
+                    <div>
+                        <label class="text-sm font-medium text-muted-foreground">{{ __('Phone') }}</label>
+                        <p class="text-sm font-medium">{{ $supplier->phone ?: '-' }}</p>
                     </div>
-
-                    <!-- Meta -->
-                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                        <div class="space-y-1">
-                            <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('Created At') }}</label>
-                            <p class="text-sm text-foreground font-medium">{{ $supplier->created_at?->format('d M Y, H:i') ?? '-' }}</p>
-                        </div>
-
-                        <div class="space-y-1">
-                            <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('Last Updated') }}</label>
-                            <p class="text-sm text-foreground font-medium">{{ $supplier->updated_at?->format('d M Y, H:i') ?? '-' }}</p>
-                        </div>
+                    <div>
+                        <label class="text-sm font-medium text-muted-foreground">{{ __('GST / Tax ID') }}</label>
+                        <p class="text-sm font-medium">{{ $supplier->tax_id ?: '-' }}</p>
                     </div>
-                </div>
+                    <div>
+                        <label class="text-sm font-medium text-muted-foreground">{{ __('Status') }}</label>
+                        <p class="text-sm font-medium">{{ Str::title($supplier->status ?: 'active') }}</p>
+                    </div>
+                </section>
 
-            <!-- Actions -->
+                <section>
+                    <h4 class="text-sm font-semibold mb-2">{{ __('Address') }}</h4>
+                    <p class="text-sm font-medium">
+                        {{ collect([$supplier->address_line_1, $supplier->address_line_2, $supplier->city, $supplier->state, $supplier->postal_code, $supplier->country])->filter()->join(', ') ?: ($supplier->address ?: '-') }}
+                    </p>
+                </section>
+
+                <section class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                        <label class="text-sm font-medium text-muted-foreground">{{ __('Bank Name') }}</label>
+                        <p class="text-sm font-medium">{{ $supplier->bank_name ?: '-' }}</p>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-muted-foreground">{{ __('Account Number') }}</label>
+                        <p class="text-sm font-medium">{{ $supplier->masked_account_number ?: '-' }}</p>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-muted-foreground">{{ __('IFSC') }}</label>
+                        <p class="text-sm font-medium">{{ $supplier->ifsc_code ?: '-' }}</p>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-muted-foreground">{{ __('Beneficiary') }}</label>
+                        <p class="text-sm font-medium">{{ $supplier->beneficiary_name ?: '-' }}</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h4 class="text-sm font-semibold mb-2">{{ __('Notes') }}</h4>
+                    <p class="text-sm font-medium whitespace-pre-line">{{ $supplier->notes ?: '-' }}</p>
+                </section>
+            </div>
+
             <div class="mt-6 flex items-center justify-end gap-x-2 pt-4 border-t border-border">
                 <x-secondary-button x-on:click="$dispatch('close-modal', { name: 'supplier-detail-modal' })">
                     {{ __('Close') }}
@@ -72,11 +91,6 @@
                     {{ __('Edit Supplier') }}
                 </x-primary-button>
             </div>
-        </div>
-    @else
-        <div class="p-8 text-center flex flex-col items-center justify-center space-y-3">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <span class="text-sm text-muted-foreground">{{ __('Loading details...') }}</span>
         </div>
     @endif
 </x-modal>

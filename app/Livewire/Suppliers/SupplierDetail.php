@@ -18,7 +18,7 @@ class SupplierDetail extends Component
     #[On('show-supplier')]
     public function show(Supplier $supplier)
     {
-        $this->supplier = $supplier;
+        $this->supplier = $supplier->load('companies');
         $this->dispatch('open-modal', name: 'supplier-detail-modal');
     }
 

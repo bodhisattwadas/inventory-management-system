@@ -3,8 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Crypt;
 
 class Supplier extends Model
 {
@@ -14,10 +16,37 @@ class Supplier extends Model
 
     protected $fillable = [
         'name',
+        'legal_name',
+        'trade_name',
+        'supplier_type',
+        'registration_number',
+        'tax_id',
+        'website',
+        'industry',
         'contact_person',
         'email',
+        'accounts_email',
+        'purchase_email',
         'phone',
+        'alternate_phone',
         'address',
+        'address_line_1',
+        'address_line_2',
+        'city',
+        'state',
+        'postal_code',
+        'country',
+        'bank_name',
+        'bank_branch',
+        'account_name',
+        'account_number_encrypted',
+        'account_number_last4',
+        'account_type',
+        'ifsc_code',
+        'swift_bic',
+        'beneficiary_name',
+        'bank_country',
+        'status',
         'notes',
     ];
 
@@ -29,6 +58,27 @@ class Supplier extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    public function companies(): BelongsToMany
+    {
+        return $this->belongsToMany(Company::class, 'supplier_companies')->withTimestamps();
+    }
+
+    public function setAccountNumberAttribute(?string $value): void
+    {
+        if (blank($value)) {
+            return;
+        }
+
+        $digits = preg_replace('/\D+/', '', $value);
+        $this->attributes['account_number_encrypted'] = Crypt::encryptString($value);
+        $this->attributes['account_number_last4'] = substr($digits, -4);
+    }
+
+    public function getMaskedAccountNumberAttribute(): ?string
+    {
+        return $this->account_number_last4 ? 'XXXXXXXX' . $this->account_number_last4 : null;
+    }
 
     public function purchases(): HasMany
     {
