@@ -72,10 +72,27 @@
                 />
             </div>
 
-            <!-- Row 2: Category & Unit -->
-            <div class="flex flex-col sm:flex-row gap-6">
+            <!-- Row 2: Brand, Category & Unit -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Brand -->
+                <div class="space-y-2">
+                    <x-input-label for="company_id" :value="__('Brand')" required />
+                    <div wire:ignore>
+                        <x-tom-select
+                            id="company_id"
+                            name="company_id"
+                            wire:model="company_id"
+                            :url="route('ajax.companies.search')"
+                            method="POST"
+                            placeholder="Select Brand"
+                            data-initial-label="{{ $brandName }}"
+                        />
+                    </div>
+                    <x-input-error :messages="$errors->get('company_id')" />
+                </div>
+
                 <!-- Category -->
-                <div class="w-full sm:w-1/2 space-y-2">
+                <div class="space-y-2">
                     <x-input-label for="category_id" :value="__('Category')" required />
                     <div wire:ignore>
                         <x-tom-select
@@ -92,7 +109,7 @@
                 </div>
 
                 <!-- Unit -->
-                <div class="w-full sm:w-1/2 space-y-2">
+                <div class="space-y-2">
                     <x-input-label for="unit_id" :value="__('Unit')" required />
                     <div wire:ignore>
                         <x-tom-select
@@ -109,30 +126,17 @@
                 </div>
             </div>
 
-            <!-- Prices (Forced Inline) -->
-            <div class="flex flex-col sm:flex-row gap-6">
-                <!-- Purchase Price -->
-                <div class="w-full sm:w-1/2 space-y-2">
-                    <x-input-label for="purchase_price" :value="__('Purchase Price') . ' (' . \App\Models\Setting::get('currency_symbol', 'Rp') . ')'" />
+            <!-- MRP -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <x-input-label for="mrp" :value="__('MRP') . ' (' . \App\Models\Setting::get('currency_symbol', 'Rp') . ')'" />
                     <x-currency-input
-                        id="purchase_price"
-                        wire:model.live.debounce.500ms="purchase_price"
+                        id="mrp"
+                        wire:model.live.debounce.500ms="mrp"
                         placeholder="0"
                         required
                     />
-                    <x-input-error :messages="$errors->get('purchase_price')" />
-                </div>
-
-                <!-- Selling Price -->
-                <div class="w-full sm:w-1/2 space-y-2">
-                    <x-input-label for="selling_price" :value="__('Selling Price') . ' (' . \App\Models\Setting::get('currency_symbol', 'Rp') . ')'" />
-                    <x-currency-input
-                        id="selling_price"
-                        wire:model.live.debounce.500ms="selling_price"
-                        placeholder="0"
-                        required
-                    />
-                    <x-input-error :messages="$errors->get('selling_price')" />
+                    <x-input-error :messages="$errors->get('mrp')" />
                 </div>
             </div>
 

@@ -49,7 +49,7 @@ final class ProductTable extends PowerGridComponent
     public function datasource(): Builder
     {
         return Product::query()
-            ->with(['category', 'unit']);
+            ->with(['category', 'unit', 'company']);
     }
 
     public function fields(): PowerGridFields
@@ -70,20 +70,11 @@ final class ProductTable extends PowerGridComponent
                 return $model->is_active ? $model->name : '(DISCONTINUE) ' . $model->name;
             })
             ->add('description')
+            ->add('brand_name', fn(Product $model) => $model->company ? ($model->company->short_name ?: $model->company->company_name) : '-')
             ->add('category_slug', fn(Product $model) => $model->category ? $model->category->slug : '-')
             ->add('category_name', fn(Product $model) => $model->category ? $model->category->name : '-')
             ->add('unit_symbol', fn(Product $model) => $model->unit ? $model->unit->symbol : '-')
-            ->add('purchase_price_formatted', fn(Product $model) => format_money($model->purchase_price))
-            ->add('selling_price_formatted', fn(Product $model) => format_money($model->selling_price))
-            ->add('margin_formatted', function(Product $model) {
-                // Calculate margin
-                $margin = $model->selling_price - $model->purchase_price;
-                $percentage = $model->purchase_price > 0 ? ($margin / $model->purchase_price) * 100 : 0;
-
-                // Format with percentage
-                return format_money($margin) .
-                    ' <span class="text-xs text-gray-500">(' . round($percentage, 1) . '%)</span>';
-            })
+            ->add('mrp_formatted', fn(Product $model) => format_money($model->mrp))
             ->add('quantity')
             ->add('min_stock')
             ->add('is_active_label', function(Product $model) {
@@ -133,21 +124,17 @@ final class ProductTable extends PowerGridComponent
                 ->hidden()
                 ->visibleInExport(true),
 
+            Column::make('Brand', 'brand_name', 'company_id')
+                ->sortable()
+                ->searchable(),
+
             Column::make('Unit', 'unit_symbol', 'unit_id')
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Buying Price', 'purchase_price_formatted', 'purchase_price')
+            Column::make('MRP', 'mrp_formatted', 'mrp')
                 ->sortable()
                 ->bodyAttribute('text-right'),
-
-            Column::make('Selling Price', 'selling_price_formatted', 'selling_price')
-                ->sortable()
-                ->bodyAttribute('text-right'),
-
-            Column::make('Margin', 'margin_formatted')
-                ->bodyAttribute('text-right text-indigo-600')
-                ->visibleInExport(false),
 
             Column::make('Qty', 'quantity')
                 ->sortable()
@@ -189,6 +176,12 @@ final class ProductTable extends PowerGridComponent
 
             Filter::multiSelectAsync('unit_symbol', 'unit_id')
                 ->url(route('ajax.units.search'))
+                ->method('POST')
+                ->optionValue('value')
+                ->optionLabel('text'),
+
+            Filter::multiSelectAsync('brand_name', 'company_id')
+                ->url(route('ajax.companies.search'))
                 ->method('POST')
                 ->optionValue('value')
                 ->optionLabel('text'),

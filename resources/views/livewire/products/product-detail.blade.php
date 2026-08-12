@@ -30,6 +30,11 @@
                 <!-- Details -->
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div class="space-y-1">
+                        <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('Brand') }}</label>
+                        <p class="text-sm text-foreground font-medium">{{ $product->company?->short_name ?: ($product->company?->company_name ?? '-') }}</p>
+                    </div>
+
+                    <div class="space-y-1">
                         <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('Category') }}</label>
                         <p class="text-sm text-foreground font-medium">{{ $product->category->name ?? '-' }}</p>
                     </div>
@@ -46,13 +51,8 @@
                     </div>
 
                     <div class="space-y-1">
-                        <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('Selling Price') }}</label>
-                        <p class="text-sm text-foreground font-medium">@money($product->selling_price)</p>
-                    </div>
-
-                    <div class="space-y-1">
-                        <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('Purchase Price') }}</label>
-                        <p class="text-sm text-foreground font-medium">@money($product->purchase_price)</p>
+                        <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('MRP') }}</label>
+                        <p class="text-sm text-foreground font-medium">@money($product->mrp)</p>
                     </div>
 
                     <div class="space-y-1">

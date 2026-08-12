@@ -7,19 +7,9 @@
 
         <form wire:submit="save" class="space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <x-form-input name="company_code" label="Company Code" wire:model="company_code" required />
-                <x-form-input name="company_name" label="Brand / Company Name" wire:model="company_name" required />
-                <x-form-input name="short_name" label="Short Name" wire:model="short_name" />
-                <x-form-input name="company_type" label="Type" wire:model="company_type" />
-            </div>
-
-            <div class="space-y-2">
-                <x-input-label for="status" :value="__('Status')" />
-                <select id="status" wire:model="status" class="w-full rounded-md border-gray-300">
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                </select>
-                <x-input-error :messages="$errors->get('status')" />
+                <x-form-input name="company_code" label="Code" wire:model="company_code" required />
+                <x-form-input name="company_name" label="Company Name" wire:model="company_name" required />
+                <x-form-input name="short_name" label="Brand Name" wire:model="short_name" required />
             </div>
 
             <div class="mt-6 flex justify-end gap-3 border-t border-gray-200 pt-4">

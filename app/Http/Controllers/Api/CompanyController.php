@@ -24,11 +24,12 @@ class CompanyController extends Controller
             })
             ->orderBy('company_name')
             ->limit(20)
-            ->get(['id', 'company_code', 'company_name']);
+            ->get(['id', 'company_code', 'company_name', 'short_name']);
 
         return response()->json($companies->map(fn (Company $company) => [
+            'value' => $company->id,
             'id' => $company->id,
-            'text' => "{$company->company_code} : {$company->company_name}",
+            'text' => "{$company->company_code} : " . ($company->short_name ?: $company->company_name),
         ]));
     }
 }

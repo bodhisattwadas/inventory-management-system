@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
+use App\Models\Company;
 use App\Models\Product;
 use App\Models\Unit;
 use Illuminate\Database\Seeder;
@@ -14,6 +15,7 @@ class ProductSeeder extends Seeder
     {
         $categories = Category::pluck('id', 'slug')->toArray();
         $units = Unit::pluck('id', 'symbol')->toArray();
+        $brandIds = Company::query()->active()->pluck('id')->values();
 
         $categoryId = fn (string $name) => $categories[Str::slug($name)] ?? reset($categories);
         $unitId = fn (string $symbol) => $units[$symbol] ?? reset($units);
@@ -41,9 +43,11 @@ class ProductSeeder extends Seeder
             Product::create([
                 'category_id' => $categoryId($product[0]),
                 'unit_id' => $unitId($product[1]),
+                'company_id' => $brandIds->isNotEmpty() ? $brandIds[$index % $brandIds->count()] : null,
                 'sku' => 'COS.'.str_pad((string) ($index + 1), 4, '0', STR_PAD_LEFT),
                 'name' => $product[2],
-                'purchase_price' => $product[3],
+                'mrp' => $product[4],
+                'purchase_price' => $product[4],
                 'selling_price' => $product[4],
                 'quantity' => $product[5],
                 'min_stock' => max(8, (int) floor($product[5] * 0.18)),

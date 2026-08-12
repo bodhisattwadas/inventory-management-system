@@ -14,8 +14,10 @@ class Product extends Model
     protected $fillable = [
         'category_id',
         'unit_id',
+        'company_id',
         'sku',
         'name',
+        'mrp',
         'purchase_price',
         'selling_price',
         'quantity',
@@ -29,6 +31,7 @@ class Product extends Model
     protected $casts = [
         'purchase_price' => 'integer',
         'selling_price' => 'integer',
+        'mrp' => 'integer',
         'quantity' => 'integer',
         'min_stock' => 'integer',
         'is_active' => 'boolean',
@@ -42,6 +45,11 @@ class Product extends Model
     public function unit()
     {
         return $this->belongsTo(Unit::class);
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
     }
 
     public function purchaseItems()

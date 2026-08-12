@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Unit;
 use App\Models\Category;
+use App\Models\Company;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,15 +21,19 @@ class ProductFactory extends Factory
     {
         $categories = Category::pluck('id')->toArray();
         $units = Unit::pluck('id')->toArray();
+        $companies = Company::pluck('id')->toArray();
+        $mrp = fake()->numberBetween(10000, 1000000);
 
         return [
             'category_id' => !empty($categories) ? fake()->randomElement($categories) : Category::factory(),
             'unit_id' => !empty($units) ? fake()->randomElement($units) : Unit::factory(),
+            'company_id' => !empty($companies) ? fake()->randomElement($companies) : null,
             'sku' => 'P.' . date('ymd') . '.' . strtoupper(fake()->unique()->lexify('????')),
             'name' => fake()->words(3, true),
             'description' => fake()->sentence(),
-            'purchase_price' => fake()->numberBetween(10000, 500000),
-            'selling_price' => fake()->numberBetween(550000, 1000000),
+            'mrp' => $mrp,
+            'purchase_price' => $mrp,
+            'selling_price' => $mrp,
             'quantity' => fake()->numberBetween(0, 100),
             'min_stock' => fake()->numberBetween(5, 20),
             'is_active' => fake()->boolean(90),

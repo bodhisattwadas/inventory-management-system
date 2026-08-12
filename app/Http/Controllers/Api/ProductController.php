@@ -31,8 +31,9 @@ class ProductController extends Controller
                         'id' => $product->id,
                         'text' => $product->name,
                         'name' => $product->name,
-                        'price' => $product->purchase_price,
-                        'selling_price' => $product->selling_price,
+                        'price' => $product->mrp ?: $product->purchase_price,
+                        'selling_price' => $product->mrp ?: $product->selling_price,
+                        'mrp' => $product->mrp,
                         'sku' => $product->sku,
                         'quantity' => $product->quantity,
                         'unit' => $product->unit ? [

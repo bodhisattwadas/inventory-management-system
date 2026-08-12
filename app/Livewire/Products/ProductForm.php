@@ -5,8 +5,7 @@ namespace App\Livewire\Products;
 use App\DTOs\ProductData;
 use App\Models\Product;
 use Livewire\Component;
-use App\Models\Category;
-use App\Models\Unit;
+use App\Models\Company;
 use Livewire\Attributes\On;
 use Livewire\WithFileUploads;
 use Illuminate\Validation\Rule;
@@ -26,6 +25,8 @@ class ProductForm extends Component
     public string $name = '';
     public ?int $category_id = null;
     public ?int $unit_id = null;
+    public ?int $company_id = null;
+    public int $mrp = 0;
     public int $purchase_price = 0;
     public int $selling_price = 0;
     public int $quantity = 0;
@@ -39,6 +40,7 @@ class ProductForm extends Component
     // Select Options (Removed for AJAX)
     public ?string $categoryName = null;
     public ?string $unitName = null;
+    public ?string $brandName = null;
 
     public function mount()
     {
@@ -53,7 +55,7 @@ class ProductForm extends Component
     #[On('create-product')]
     public function create(): void
     {
-        $this->reset(['sku', 'name', 'category_id', 'unit_id', 'purchase_price', 'selling_price', 'quantity', 'min_stock', 'description', 'notes', 'image', 'currentImagePath', 'product', 'isEditing', 'categoryName', 'unitName']);
+        $this->reset(['sku', 'name', 'category_id', 'unit_id', 'company_id', 'brandName', 'mrp', 'purchase_price', 'selling_price', 'quantity', 'min_stock', 'description', 'notes', 'image', 'currentImagePath', 'product', 'isEditing', 'categoryName', 'unitName']);
         $this->is_active = true;
 
         $this->dispatch('open-modal', name: 'product-form-modal');
@@ -67,8 +69,10 @@ class ProductForm extends Component
         $this->name = $product->name;
         $this->category_id = $product->category_id;
         $this->unit_id = $product->unit_id;
-        $this->purchase_price = $product->purchase_price;
-        $this->selling_price = $product->selling_price;
+        $this->company_id = $product->company_id;
+        $this->mrp = $product->mrp;
+        $this->purchase_price = $product->mrp;
+        $this->selling_price = $product->mrp;
         $this->quantity = $product->quantity;
         $this->min_stock = $product->min_stock;
         $this->is_active = $product->is_active;
@@ -80,6 +84,7 @@ class ProductForm extends Component
         // Set initial labels for TomSelect
         $this->categoryName = $product->category ? $product->category->name : null;
         $this->unitName = $product->unit ? "{$product->unit->name} ({$product->unit->symbol})" : null;
+        $this->brandName = $product->company ? ($product->company->short_name ?: $product->company->company_name) : null;
 
         $this->isEditing = true;
 
@@ -98,8 +103,8 @@ class ProductForm extends Component
             ],
             'category_id' => ['required', 'exists:categories,id'],
             'unit_id' => ['required', 'exists:units,id'],
-            'purchase_price' => ['required', 'integer', 'min:0'],
-            'selling_price' => ['required', 'integer', 'min:0'],
+            'company_id' => ['required', 'exists:companies,id'],
+            'mrp' => ['required', 'integer', 'min:0'],
             'quantity' => ['required', 'integer', 'min:0'],
             'min_stock' => ['required', 'integer', 'min:0'],
             'is_active' => ['boolean'],
@@ -112,6 +117,8 @@ class ProductForm extends Component
     public function save(ProductService $service): void
     {
         $validated = $this->validate();
+        $validated['purchase_price'] = $validated['mrp'];
+        $validated['selling_price'] = $validated['mrp'];
         $validated['image_path'] = $this->image
             ? $this->image->store('products', 'public')
             : null;
