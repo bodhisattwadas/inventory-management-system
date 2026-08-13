@@ -140,23 +140,12 @@
                 </div>
             </div>
 
-            <!-- Row 5: Qty, Min Stock, Active -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Quantity -->
-                <x-form-input
-                    name="quantity"
-                    label="Quantity"
-                    type="number"
-                    wire:model="quantity"
-                    min="0"
-                    placeholder="0"
-                    required
-                />
-
-                <!-- Min Stock -->
+            <!-- Minimum Quantity and Active Status -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Minimum Quantity -->
                 <x-form-input
                     name="min_stock"
-                    label="Min Stock Alert"
+                    label="Minimum Quantity"
                     type="number"
                     wire:model="min_stock"
                     min="0"

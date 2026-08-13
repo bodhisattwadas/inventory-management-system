@@ -29,7 +29,6 @@ class ProductForm extends Component
     public int $mrp = 0;
     public int $purchase_price = 0;
     public int $selling_price = 0;
-    public int $quantity = 0;
     public int $min_stock = 0;
     public bool $is_active = true;
     public string $description = '';
@@ -55,7 +54,7 @@ class ProductForm extends Component
     #[On('create-product')]
     public function create(): void
     {
-        $this->reset(['sku', 'name', 'category_id', 'unit_id', 'company_id', 'brandName', 'mrp', 'purchase_price', 'selling_price', 'quantity', 'min_stock', 'description', 'notes', 'image', 'currentImagePath', 'product', 'isEditing', 'categoryName', 'unitName']);
+        $this->reset(['sku', 'name', 'category_id', 'unit_id', 'company_id', 'brandName', 'mrp', 'purchase_price', 'selling_price', 'min_stock', 'description', 'notes', 'image', 'currentImagePath', 'product', 'isEditing', 'categoryName', 'unitName']);
         $this->is_active = true;
 
         $this->dispatch('open-modal', name: 'product-form-modal');
@@ -73,7 +72,6 @@ class ProductForm extends Component
         $this->mrp = $product->mrp;
         $this->purchase_price = $product->mrp;
         $this->selling_price = $product->mrp;
-        $this->quantity = $product->quantity;
         $this->min_stock = $product->min_stock;
         $this->is_active = $product->is_active;
         $this->description = $product->description ?? '';
@@ -105,7 +103,6 @@ class ProductForm extends Component
             'unit_id' => ['required', 'exists:units,id'],
             'company_id' => ['required', 'exists:companies,id'],
             'mrp' => ['required', 'integer', 'min:0'],
-            'quantity' => ['required', 'integer', 'min:0'],
             'min_stock' => ['required', 'integer', 'min:0'],
             'is_active' => ['boolean'],
             'description' => ['nullable', 'string'],

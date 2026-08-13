@@ -140,7 +140,7 @@ final class ProductTable extends PowerGridComponent
                 ->sortable()
                 ->bodyAttribute('text-center'),
 
-            Column::make('Min Qty', 'min_stock')
+            Column::make('Minimum Quantity', 'min_stock')
                 ->sortable()
                 ->bodyAttribute('text-center'),
 

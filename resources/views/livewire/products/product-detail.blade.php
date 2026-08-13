@@ -63,7 +63,7 @@
                     </div>
 
                     <div class="space-y-1">
-                        <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('Min Stock Alert') }}</label>
+                        <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('Minimum Quantity') }}</label>
                         <p class="text-sm text-foreground font-medium">{{ $product->min_stock }}</p>
                     </div>
                 </div>

@@ -89,7 +89,7 @@ class SupplierForm extends Component
             'bank_branch' => ['nullable', 'string', 'max:255'],
             'account_name' => ['nullable', 'string', 'max:255'],
             'account_number' => ['nullable', 'string', 'max:100'],
-            'account_type' => ['nullable', 'string', 'max:100'],
+            'account_type' => ['nullable', 'in:Savings,Current'],
             'ifsc_code' => ['nullable', 'string', 'max:50'],
             'swift_bic' => ['nullable', 'string', 'max:50'],
             'beneficiary_name' => ['nullable', 'string', 'max:255'],

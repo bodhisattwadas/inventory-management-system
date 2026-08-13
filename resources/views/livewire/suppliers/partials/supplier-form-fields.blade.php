@@ -10,7 +10,7 @@
 @endunless
 
 <form wire:submit="save" class="{{ $formClass }}">
-    <section class="pb-6">
+    <section class="{{ $asPage ? 'pt-4 ' : '' }}pb-6">
         <div class="mb-4">
             <h4 class="text-sm font-semibold text-foreground">{{ __('Supplier Details') }}</h4>
             <p class="text-xs text-muted-foreground">{{ __('Identity, tax, registration, and operating status.') }}</p>
@@ -82,13 +82,19 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <x-form-input name="bank_name" label="Bank Name" wire:model="bank_name" />
             <x-form-input name="bank_branch" label="Branch" wire:model="bank_branch" />
-            <x-form-input name="account_name" label="Account Name" wire:model="account_name" />
             <x-form-input name="account_number" label="Account Number" wire:model="account_number" />
-            <x-form-input name="account_type" label="Account Type" wire:model="account_type" />
+            <div class="space-y-2">
+                <x-input-label for="account_type" :value="__('Account Type')" />
+                <select id="account_type" name="account_type" wire:model="account_type" class="w-full rounded-md border-gray-300">
+                    <option value="">Select Account Type</option>
+                    <option value="Savings">Savings</option>
+                    <option value="Current">Current</option>
+                </select>
+                <x-input-error :messages="$errors->get('account_type')" />
+            </div>
             <x-form-input name="ifsc_code" label="IFSC Code" wire:model="ifsc_code" />
             <x-form-input name="swift_bic" label="SWIFT / BIC" wire:model="swift_bic" />
             <x-form-input name="beneficiary_name" label="Beneficiary Name" wire:model="beneficiary_name" />
-            <x-form-input name="bank_country" label="Bank Country" wire:model="bank_country" />
         </div>
         <p class="mt-2 text-xs text-gray-500">{{ __('Saved account numbers are encrypted and only the last four digits are kept searchable.') }}</p>
     </section>

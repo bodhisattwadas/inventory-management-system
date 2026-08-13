@@ -58,7 +58,30 @@ final class CompanyTable extends PowerGridComponent
     {
         return [
             Button::add('edit')->slot('Edit')->class('bg-amber-500 text-white px-3 py-1 rounded-md')->dispatch('edit-company', ['company' => $row->id]),
+            Button::add('delete')
+                ->slot('Delete')
+                ->class('bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md')
+                ->dispatch('open-delete-modal', [
+                    'component' => 'companies.company-table',
+                    'method' => 'delete',
+                    'params' => ['rowId' => $row->id],
+                    'title' => 'Delete Brand / Company?',
+                    'description' => "Are you sure you want to delete '" . ($row->short_name ?: $row->company_name) . "'? This action cannot be undone.",
+                ])
+                ->tooltip('Delete Brand / Company'),
         ];
+    }
+
+    #[On('delete')]
+    public function delete($rowId): void
+    {
+        $company = Company::find($rowId);
+
+        if ($company) {
+            $company->delete();
+            $this->dispatch('pg:eventRefresh-company-table');
+            $this->dispatch('toast', message: 'Brand / company deleted successfully.', type: 'success');
+        }
     }
 
     #[On('toggle-company')]
