@@ -9,6 +9,7 @@ class PurchaseData
 {
     public function __construct(
         public int $supplier_id,
+        public ?int $company_id,
         public Carbon $purchase_date,
         public array $items,
         public ?string $invoice_number = null,
@@ -27,6 +28,7 @@ class PurchaseData
 
         return new self(
             supplier_id: (int) $data['supplier_id'],
+            company_id: !empty($data['company_id']) ? (int) $data['company_id'] : null,
             purchase_date: Carbon::parse($data['purchase_date']),
             items: $items,
             invoice_number: !empty($data['invoice_number']) ? $data['invoice_number'] : null,
@@ -41,6 +43,7 @@ class PurchaseData
     {
         return [
             'supplier_id' => $this->supplier_id,
+            'company_id' => $this->company_id,
             'purchase_date' => $this->purchase_date->toDateTimeString(),
             'items' => array_map(fn($item) => $item->toArray(), $this->items),
             'invoice_number' => $this->invoice_number,

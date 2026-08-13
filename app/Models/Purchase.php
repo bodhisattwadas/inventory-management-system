@@ -15,6 +15,7 @@ class Purchase extends Model
     protected $fillable = [
         'invoice_number',
         'supplier_id',
+        'company_id',
         'purchase_date',
         'due_date',
         'total',
@@ -29,6 +30,7 @@ class Purchase extends Model
         'due_date' => 'date',
         'total' => 'integer',
         'supplier_id' => 'integer',
+        'company_id' => 'integer',
         'created_by' => 'integer',
         'status' => PurchaseStatus::class,
     ];
@@ -36,6 +38,11 @@ class Purchase extends Model
     public function supplier(): BelongsTo
     {
         return $this->belongsTo(Supplier::class);
+    }
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
     }
 
     public function items(): HasMany

@@ -62,7 +62,7 @@ class PurchaseController extends Controller
 
     public function show(Purchase $purchase)
     {
-        $purchase->load(['supplier', 'creator', 'items.product.unit']);
+        $purchase->load(['supplier', 'company', 'creator', 'items.product.unit', 'items.product.company']);
         return view('purchases.show', compact('purchase'));
     }
 
@@ -73,7 +73,7 @@ class PurchaseController extends Controller
         }
 
         // Load relationships needed for the form
-        $purchase->load('items.product', 'supplier');
+        $purchase->load('items.product.company', 'supplier', 'company');
 
         return view('purchases.edit', [
             'purchase' => $purchase,

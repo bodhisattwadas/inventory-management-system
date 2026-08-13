@@ -16,6 +16,7 @@ class UpdatePurchaseRequest extends FormRequest
     {
         return [
             'supplier_id' => ['required', 'exists:suppliers,id'],
+            'company_id' => ['required', 'exists:companies,id'],
             'invoice_number' => [
                 'nullable',
                 'string',

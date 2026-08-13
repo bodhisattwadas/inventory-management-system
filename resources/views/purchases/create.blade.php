@@ -1,8 +1,8 @@
-<x-app-layout title="Create Purchase">
+<x-app-layout title="Create Purchase Order">
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-foreground leading-tight">
-                {{ __('Create Purchase') }}
+                {{ __('Create Purchase Order') }}
             </h2>
             <x-secondary-button href="{{ route('purchases.index') }}">
                 &larr; {{ __('Back to List') }}
@@ -16,6 +16,7 @@
                     x-data="purchaseForm({
                         items: {{ Js::from(old('items', [])) }},
                         supplier_id: {{ Js::from(old('supplier_id')) }},
+                        company_id: {{ Js::from(old('company_id')) }},
                         status: {{ Js::from(old('status', 'draft')) }},
                         errors: {{ Js::from($errors->any() ? $errors->toArray() : []) }}
                     })"

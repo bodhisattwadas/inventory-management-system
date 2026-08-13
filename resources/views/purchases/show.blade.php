@@ -1,8 +1,8 @@
-<x-app-layout title="Purchase Details">
+<x-app-layout title="Purchase Order Details">
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-foreground leading-tight">
-                {{ __('Purchase Details') }} #{{ $purchase->invoice_number ?: $purchase->id }}
+                {{ __('Purchase Order Details') }} #{{ $purchase->invoice_number ?: $purchase->id }}
             </h2>
             <div class="flex items-center gap-2">
                 <x-secondary-button href="{{ route('purchases.index') }}">
@@ -25,8 +25,8 @@
                     <!-- Header Info -->
                     <div class="flex items-start justify-between border-b border-gray-100 pb-4 mb-6">
                         <div>
-                            <h3 class="text-lg font-medium text-gray-900">{{ __('Purchase Information') }}</h3>
-                            <p class="text-sm text-gray-500">{{ __('Details of the purchase transaction') }}</p>
+                            <h3 class="text-lg font-medium text-gray-900">{{ __('Purchase Order Information') }}</h3>
+                            <p class="text-sm text-gray-500">{{ __('Vendor order details before goods are received.') }}</p>
                         </div>
                         <div class="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs font-medium border border-slate-200">
                             ID: #{{ $purchase->id }}
@@ -36,22 +36,26 @@
                     <!-- Content Grid -->
                     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                         <!-- Supplier -->
-                        <x-detail-item label="Supplier" :value="$purchase->supplier->name">
+                        <x-detail-item label="Supplier / Vendor" :value="$purchase->supplier->name">
                             <x-heroicon-o-building-storefront class="w-4 h-4 text-gray-400" />
                         </x-detail-item>
 
-                        <!-- Invoice -->
-                        <x-detail-item label="Invoice Number" :value="$purchase->invoice_number ?? '-'">
+                        <x-detail-item label="Brand / Company" :value="$purchase->company ? ($purchase->company->short_name ?: $purchase->company->company_name) : '-'">
+                            <x-heroicon-o-building-office-2 class="w-4 h-4 text-gray-400" />
+                        </x-detail-item>
+
+                        <!-- PO Reference -->
+                        <x-detail-item label="PO Reference" :value="$purchase->invoice_number ?? '-'">
                             <x-heroicon-o-document-text class="w-4 h-4 text-gray-400" />
                         </x-detail-item>
 
-                        <!-- Purchase Date -->
-                        <x-detail-item label="Purchase Date" :value="$purchase->purchase_date->format('d M Y')">
+                        <!-- PO Date -->
+                        <x-detail-item label="PO Date" :value="$purchase->purchase_date->format('d M Y')">
                             <x-heroicon-o-calendar class="w-4 h-4 text-gray-400" />
                         </x-detail-item>
 
-                        <!-- Due Date -->
-                        <x-detail-item label="Due Date" :value="$purchase->due_date ? $purchase->due_date->format('d M Y') : '-'">
+                        <!-- Expected Delivery -->
+                        <x-detail-item label="Expected Delivery" :value="$purchase->due_date ? $purchase->due_date->format('d M Y') : '-'">
                             <x-heroicon-o-calendar class="w-4 h-4 text-gray-400" />
                         </x-detail-item>
 
@@ -66,7 +70,7 @@
                         </div>
 
                         <!-- Total Amount -->
-                        <x-detail-item label="Total Amount" :value="format_money($purchase->total)">
+                        <x-detail-item label="Total PO Amount" :value="format_money($purchase->total)">
                             <x-heroicon-o-banknotes class="w-4 h-4 text-gray-400" />
                         </x-detail-item>
 
@@ -110,10 +114,11 @@
                                 <tr>
                                     <th class="px-6 py-3">Code</th>
                                     <th class="px-6 py-3">Product</th>
+                                    <th class="px-6 py-3">Brand</th>
                                     <th class="px-6 py-3">Unit</th>
                                     <th class="px-6 py-3 text-center">Quantity</th>
-                                    <th class="px-6 py-3 text-right">Buying Price</th>
-                                    <th class="px-6 py-3 text-right">Selling Price</th>
+                                    <th class="px-6 py-3 text-right">MRP</th>
+                                    <th class="px-6 py-3 text-right">Order Price</th>
                                     <th class="px-6 py-3 text-right">Subtotal</th>
                                 </tr>
                             </thead>
@@ -127,16 +132,19 @@
                                             {{ $item->product->name }}
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-500">
+                                            {{ $item->product->company->short_name ?? $item->product->company->company_name ?? '-' }}
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-gray-500">
                                             {{ $item->product->unit->symbol ?? $item->product->unit->name ?? '-' }}
                                         </td>
                                         <td class="px-6 py-4 text-center">
                                             {{ number_format($item->quantity) }}
                                         </td>
                                         <td class="px-6 py-4 text-right">
-                                            @money($item->unit_price)
+                                            @money($item->selling_price)
                                         </td>
                                         <td class="px-6 py-4 text-right">
-                                            @money($item->selling_price)
+                                            @money($item->unit_price)
                                         </td>
                                         <td class="px-6 py-4 text-right font-medium">
                                             @money($item->subtotal)
@@ -146,7 +154,7 @@
                             </tbody>
                             <tfoot class="bg-gray-50 font-bold">
                                 <tr>
-                                    <td colspan="6" class="px-6 py-4 text-right">Total</td>
+                                    <td colspan="7" class="px-6 py-4 text-right">Total PO</td>
                                     <td class="px-6 py-4 text-right text-indigo-600 text-lg">
                                         @money($purchase->total)
                                     </td>

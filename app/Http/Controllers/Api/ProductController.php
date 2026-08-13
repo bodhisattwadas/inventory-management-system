@@ -17,7 +17,7 @@ class ProductController extends Controller
 
         $products = Cache::remember($cacheKey, 300, function () use ($query) {
             return Product::query()
-                ->with(['unit'])
+                ->with(['unit', 'company'])
                 ->where('quantity', '>', 0) // Only show available products
                 ->when($query, function ($q) use ($query) {
                     $q->where('name', 'like', "%{$query}%")
@@ -35,6 +35,8 @@ class ProductController extends Controller
                         'selling_price' => $product->mrp ?: $product->selling_price,
                         'mrp' => $product->mrp,
                         'sku' => $product->sku,
+                        'brand' => $product->company ? ($product->company->short_name ?: $product->company->company_name) : null,
+                        'brand_id' => $product->company_id,
                         'quantity' => $product->quantity,
                         'unit' => $product->unit ? [
                             'symbol' => $product->unit->symbol,

@@ -1,8 +1,8 @@
-<x-app-layout title="Edit Purchase">
+<x-app-layout title="Edit Purchase Order">
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-foreground leading-tight">
-                {{ __('Edit Purchase') }} #{{ $purchase->id }}
+                {{ __('Edit Purchase Order') }} #{{ $purchase->id }}
             </h2>
             <x-secondary-button href="{{ route('purchases.index') }}">
                 &larr; {{ __('Back to List') }}
@@ -24,9 +24,12 @@
                                 'key' => Str::random(10),
                                 'product_name' => $item->product->name ?? '',
                                 'product_code' => $item->product->sku ?? ''
+                                ,'brand' => $item->product->company ? ($item->product->company->short_name ?: $item->product->company->company_name) : ''
+                                ,'mrp' => $item->product->mrp ?? 0
                             ];
                         }))) }},
                         supplier_id: {{ Js::from(old('supplier_id', $purchase->supplier_id)) }},
+                        company_id: {{ Js::from(old('company_id', $purchase->company_id)) }},
                         status: {{ Js::from(old('status', $purchase->status->value)) }},
                         errors: {{ Js::from($errors->any() ? $errors->toArray() : []) }}
                     })"

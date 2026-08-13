@@ -25,6 +25,7 @@ class PurchaseService
                 $purchase = Purchase::create([
                     'invoice_number' => $data->invoice_number,
                     'supplier_id' => $data->supplier_id,
+                    'company_id' => $data->company_id,
                     'purchase_date' => $data->purchase_date,
                     'due_date' => $data->due_date,
                     'status' => $data->status,
@@ -55,6 +56,7 @@ class PurchaseService
                 $purchase->update([
                     'invoice_number' => $data->invoice_number,
                     'supplier_id' => $data->supplier_id,
+                    'company_id' => $data->company_id,
                     'purchase_date' => $data->purchase_date,
                     'due_date' => $data->due_date,
                     'notes' => $data->notes,

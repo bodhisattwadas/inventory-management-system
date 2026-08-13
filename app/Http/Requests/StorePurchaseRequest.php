@@ -16,6 +16,7 @@ class StorePurchaseRequest extends FormRequest
     {
         return [
             'supplier_id' => ['required', 'exists:suppliers,id'],
+            'company_id' => ['required', 'exists:companies,id'],
             'invoice_number' => ['nullable', 'string', 'max:255', 'unique:purchases,invoice_number'],
             'purchase_date' => ['required', 'date'],
             'due_date' => ['nullable', 'date', 'after_or_equal:purchase_date'],
