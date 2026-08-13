@@ -80,6 +80,11 @@ class Company extends Model
             ->withTimestamps();
     }
 
+    public function suppliers(): BelongsToMany
+    {
+        return $this->belongsToMany(Supplier::class, 'supplier_companies')->withTimestamps();
+    }
+
     public function scopeActive($query)
     {
         return $query->where('status', 'active');

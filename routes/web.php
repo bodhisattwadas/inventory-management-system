@@ -6,6 +6,8 @@ use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FinanceReportController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\VendorProfileController;
+use App\Http\Controllers\SupplierProfileController;
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // =========================================================================
@@ -18,6 +20,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('profile', 'profile.index')->name('profile.index');
     Route::view('companies', 'companies.index')->name('companies.index');
     Route::delete('companies/{company}', [CompanyController::class, 'destroy'])->name('companies.destroy');
+    Route::get('vendors/{vendor}/profile.pdf', [VendorProfileController::class, 'download'])->name('vendors.profile.pdf');
+    Route::get('suppliers/{supplier}/profile.pdf', [SupplierProfileController::class, 'download'])->name('suppliers.profile.pdf');
 
     // =========================================================================
     // Master Data
@@ -25,6 +29,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('master')->group(function () {
         Route::view('customers', 'customers.index')->name('customers.index');
         Route::view('suppliers/create', 'suppliers.create')->name('suppliers.create');
+        Route::get('suppliers/{supplier}/edit', function (\App\Models\Supplier $supplier) {
+            return view('suppliers.edit', compact('supplier'));
+        })->name('suppliers.edit');
         Route::view('suppliers', 'suppliers.index')->name('suppliers.index');
         Route::view('companies', 'companies.index')->name('master.companies.index');
         Route::view('categories', 'categories.index')->name('categories.index');

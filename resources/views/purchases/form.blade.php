@@ -17,22 +17,6 @@
         </div>
 
         <div class="space-y-2">
-            <x-input-label for="company_id" :value="__('Brand / Company')" required />
-            <select id="company_id" name="company_id" x-init="initCompanySelect($el)" x-model="company_id" autocomplete="off">
-                <option value=""></option>
-                @if(old('company_id'))
-                    @php($oldCompany = \App\Models\Company::find(old('company_id')))
-                    @if($oldCompany)
-                        <option value="{{ $oldCompany->id }}" selected>{{ $oldCompany->company_code }} : {{ $oldCompany->short_name ?: $oldCompany->company_name }}</option>
-                    @endif
-                @elseif(isset($purchase) && $purchase->company)
-                    <option value="{{ $purchase->company_id }}" selected>{{ $purchase->company->company_code }} : {{ $purchase->company->short_name ?: $purchase->company->company_name }}</option>
-                @endif
-            </select>
-            <x-input-error :messages="$errors->get('company_id')" />
-        </div>
-
-        <div class="space-y-2">
             <x-input-label for="invoice_number" :value="__('PO Reference (Optional)')" />
             <x-text-input id="invoice_number" name="invoice_number" :value="old('invoice_number', $purchase->invoice_number ?? '')" placeholder="Leave empty for draft" />
             <x-input-error :messages="$errors->get('invoice_number')" />
@@ -59,7 +43,28 @@
     </div>
 
     <div class="space-y-4">
-        <select id="master_product_search" x-init="initMasterSearch($el)" placeholder="Search product from Product Master..." autocomplete="off"></select>
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div class="space-y-2">
+                <x-input-label for="company_id" :value="__('Brand')" required />
+                <select id="company_id" name="company_id" x-init="initCompanySelect($el)" x-model="company_id" autocomplete="off">
+                    <option value=""></option>
+                    @if(old('company_id'))
+                        @php($oldCompany = \App\Models\Company::find(old('company_id')))
+                        @if($oldCompany)
+                            <option value="{{ $oldCompany->id }}" selected>{{ $oldCompany->company_code }} : {{ $oldCompany->short_name ?: $oldCompany->company_name }}</option>
+                        @endif
+                    @elseif(isset($purchase) && $purchase->company)
+                        <option value="{{ $purchase->company_id }}" selected>{{ $purchase->company->company_code }} : {{ $purchase->company->short_name ?: $purchase->company->company_name }}</option>
+                    @endif
+                </select>
+                <x-input-error :messages="$errors->get('company_id')" />
+                <p class="text-xs text-gray-500">Select a vendor first to load its brands.</p>
+            </div>
+            <div class="space-y-2 md:col-span-2">
+                <x-input-label for="master_product_search" :value="__('Product Search')" />
+                <select id="master_product_search" x-init="initMasterSearch($el)" placeholder="Select a brand first..." autocomplete="off"></select>
+            </div>
+        </div>
 
         <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow">
             <div class="overflow-x-auto">
@@ -70,7 +75,7 @@
                             <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Brand</th>
                             <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">Qty</th>
                             <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">MRP</th>
-                            <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Order Price</th>
+                            <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">MRP Discount %</th>
                             <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Subtotal</th>
                             <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">Action</th>
                         </tr>
@@ -88,9 +93,14 @@
                                     <input type="number" :name="`items[${index}][quantity]`" x-model.number="item.quantity" @input="calculateLine(index)" class="w-20 rounded-md border-gray-300 text-center text-sm" min="1">
                                 </td>
                                 <td class="px-4 py-3 text-right text-sm" x-text="window.formatMoney(item.mrp || 0)"></td>
-                                <td class="px-4 py-3 text-right">
-                                    <input type="number" :name="`items[${index}][unit_price]`" x-model.number="item.unit_price" @input="calculateLine(index)" class="w-32 rounded-md border-gray-300 text-right text-sm" min="0">
+                                <td class="px-4 py-3 text-center">
+                                    <div class="inline-flex items-center gap-1">
+                                        <input type="number" :name="`items[${index}][discount_percent]`" x-model.number="item.discount_percent" @input="calculateLine(index)" class="w-24 rounded-md border-gray-300 text-right text-sm" min="0" max="100" step="0.01">
+                                        <span class="text-sm text-gray-500">%</span>
+                                    </div>
+                                    <input type="hidden" :name="`items[${index}][unit_price]`" :value="item.unit_price">
                                     <input type="hidden" :name="`items[${index}][selling_price]`" :value="item.mrp || item.unit_price || 0">
+                                    <div class="mt-1 text-xs text-gray-500" x-text="'Agreed: ' + window.formatMoney(item.unit_price)"></div>
                                 </td>
                                 <td class="px-4 py-3 text-right text-sm font-semibold" x-text="window.formatMoney(item.subtotal)"></td>
                                 <td class="px-4 py-3 text-center">
@@ -137,6 +147,9 @@
                 ...i,
                 key: i.key || Math.random().toString(36).slice(2),
                 mrp: parseInt(i.mrp || i.selling_price || 0),
+                discount_percent: i.discount_percent ?? ((parseInt(i.mrp || i.selling_price || 0) > 0)
+                    ? Math.max(0, Math.min(100, Number((100 - ((parseInt(i.unit_price) || 0) / parseInt(i.mrp || i.selling_price || 0) * 100)).toFixed(2))))
+                    : 0),
                 subtotal: parseInt(i.subtotal) || ((parseInt(i.quantity) || 0) * (parseInt(i.unit_price) || 0))
             })),
             supplier_id: initialData.supplier_id || '',
@@ -156,6 +169,8 @@
 
             calculateLine(index) {
                 const item = this.items[index];
+                item.discount_percent = Math.max(0, Math.min(100, parseFloat(item.discount_percent) || 0));
+                item.unit_price = Math.round((parseInt(item.mrp) || 0) * (1 - item.discount_percent / 100));
                 item.subtotal = (parseInt(item.quantity) || 0) * (parseInt(item.unit_price) || 0);
             },
 
@@ -169,11 +184,60 @@
             },
 
             initSupplierSelect(el) {
-                this.initRemoteSelect(el, '{{ route("ajax.suppliers.search") }}', value => this.supplier_id = value, 'Select Supplier / Vendor...');
+                this.initRemoteSelect(el, '{{ route("ajax.suppliers.search") }}', value => {
+                    if (this.supplier_id == value) return;
+                    this.supplier_id = value;
+                    this.company_id = '';
+                    this.items = [];
+                    const brandSelect = document.getElementById('company_id')?.tomselect;
+                    brandSelect?.clear(true);
+                    brandSelect?.clearOptions();
+                    if (value) brandSelect?.load('');
+                    this.updateProductSearchState();
+                }, 'Select Supplier / Vendor...');
             },
 
             initCompanySelect(el) {
-                this.initRemoteSelect(el, '{{ route("ajax.companies.search") }}', value => this.company_id = value, 'Select Brand / Company...');
+                this.waitForTomSelect(() => {
+                    new TomSelect(el, {
+                        placeholder: 'Select Brand...',
+                        preload: false,
+                        valueField: 'value',
+                        labelField: 'text',
+                        searchField: 'text',
+                        load: (query, callback) => {
+                            if (!this.supplier_id) return callback();
+                            this.fetchOptions('{{ route("ajax.companies.search") }}', { q: query, supplier_id: this.supplier_id }, callback);
+                        },
+                        onChange: value => {
+                            if (this.company_id != value) this.items = [];
+                            this.company_id = value;
+                            this.updateProductSearchState();
+                        }
+                    });
+                });
+            },
+
+            fetchOptions(url, data, callback) {
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify(data)
+                }).then(r => r.json()).then(callback).catch(() => callback());
+            },
+
+            updateProductSearchState() {
+                const search = document.getElementById('master_product_search')?.tomselect;
+                if (!search) return;
+                search.clear(true);
+                search.clearOptions();
+                this.company_id ? search.enable() : search.disable();
+                search.settings.placeholder = this.company_id ? 'Search products for selected brand...' : 'Select a brand first...';
+                search.inputState();
+                if (this.company_id) search.load('');
             },
 
             initRemoteSelect(el, url, onChange, placeholder) {
@@ -215,6 +279,7 @@
                     product_code: product.sku,
                     brand: product.brand,
                     mrp: parseInt(product.mrp || price || 0),
+                    discount_percent: 0,
                     quantity: 1,
                     unit_price: price,
                     subtotal: price
@@ -229,15 +294,13 @@
                         valueField: 'value',
                         labelField: 'text',
                         searchField: 'text',
-                        load(query, callback) {
-                            fetch('{{ route("ajax.products.search") }}', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                                },
-                                body: JSON.stringify({ q: query })
-                            }).then(r => r.json()).then(callback).catch(() => callback());
+                        load: (query, callback) => {
+                            if (!this.company_id) return callback();
+                            this.fetchOptions('{{ route("ajax.products.search") }}', {
+                                q: query,
+                                company_id: this.company_id,
+                                for_purchase: true
+                            }, callback);
                         },
                         onItemAdd: (value) => {
                             const data = el.tomselect.options[value];
@@ -246,6 +309,7 @@
                             el.tomselect.focus();
                         }
                     });
+                    this.updateProductSearchState();
                 });
             }
         }));

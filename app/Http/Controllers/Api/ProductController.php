@@ -12,16 +12,22 @@ class ProductController extends Controller
     public function search(Request $request)
     {
         $query = $request->input('q') ?? $request->input('search');
+        $companyId = $request->integer('company_id');
+        $forPurchase = $request->boolean('for_purchase');
 
-        $cacheKey = 'products_search_' . md5($query);
+        $cacheKey = 'products_search_' . md5(json_encode([$query, $companyId, $forPurchase]));
 
-        $products = Cache::remember($cacheKey, 300, function () use ($query) {
+        $products = Cache::remember($cacheKey, 300, function () use ($query, $companyId, $forPurchase) {
             return Product::query()
                 ->with(['unit', 'company'])
-                ->where('quantity', '>', 0) // Only show available products
+                ->where('is_active', true)
+                ->when(! $forPurchase, fn ($builder) => $builder->where('quantity', '>', 0))
+                ->when($companyId, fn ($builder) => $builder->where('company_id', $companyId))
                 ->when($query, function ($q) use ($query) {
-                    $q->where('name', 'like', "%{$query}%")
-                        ->orWhere('sku', 'like', "%{$query}%");
+                    $q->where(function ($searchQuery) use ($query) {
+                        $searchQuery->where('name', 'like', "%{$query}%")
+                            ->orWhere('sku', 'like', "%{$query}%");
+                    });
                 })
                 ->limit(50)
                 ->get()

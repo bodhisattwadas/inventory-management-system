@@ -123,7 +123,7 @@ final class SupplierTable extends PowerGridComponent
             Button::add('edit')
                 ->slot('Edit')
                 ->class('bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-md text-xs font-medium inline-flex items-center justify-center')
-                ->dispatch('edit-supplier', ['supplier' => $row->id])
+                ->route('suppliers.edit', ['supplier' => $row->id])
                 ->tooltip('Edit Supplier'),
 
             Button::add('delete')

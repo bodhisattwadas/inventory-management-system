@@ -17,6 +17,5 @@
         </div>
     </div>
 
-    <livewire:suppliers.supplier-form />
     <livewire:suppliers.supplier-detail />
 </x-app-layout>

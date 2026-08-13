@@ -7,7 +7,13 @@
                         <h3 class="text-lg font-semibold">{{ $vendor->vendor_name }}</h3>
                         <p class="text-sm text-muted-foreground">{{ $vendor->vendor_code }} · {{ Str::title($vendor->status) }}</p>
                     </div>
-                    <span class="rounded bg-gray-100 px-2 py-1 text-xs">{{ Str::title($vendor->approval_status) }}</span>
+                    <div class="flex items-center gap-2">
+                        <a href="{{ route('vendors.profile.pdf', $vendor) }}" class="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700">
+                            <x-heroicon-o-arrow-down-tray class="mr-1.5 h-4 w-4" />
+                            Download Profile PDF
+                        </a>
+                        <span class="rounded bg-gray-100 px-2 py-1 text-xs">{{ Str::title($vendor->approval_status) }}</span>
+                    </div>
                 </div>
             </div>
 

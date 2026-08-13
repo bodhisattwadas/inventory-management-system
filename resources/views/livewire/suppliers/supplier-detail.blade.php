@@ -1,13 +1,15 @@
 <x-modal name="supplier-detail-modal" focusable>
     @if($supplier)
         <div class="p-6 max-h-[85vh] overflow-y-auto">
-            <div class="mb-6 space-y-1.5 text-center sm:text-left border-b border-gray-200 pb-4">
-                <h3 class="text-lg font-semibold leading-none tracking-tight text-foreground">
-                    {{ $supplier->name }}
-                </h3>
-                <p class="text-sm text-muted-foreground">
-                    {{ $supplier->legal_name ?: __('Supplier / Vendor Details') }}
-                </p>
+            <div class="mb-6 flex items-start justify-between gap-4 border-b border-gray-200 pb-4">
+                <div class="space-y-1.5">
+                    <h3 class="text-lg font-semibold leading-none tracking-tight text-foreground">{{ $supplier->name }}</h3>
+                    <p class="text-sm text-muted-foreground">{{ $supplier->legal_name ?: __('Supplier / Vendor Details') }}</p>
+                </div>
+                <a href="{{ route('suppliers.profile.pdf', $supplier) }}" class="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700">
+                    <x-heroicon-o-arrow-down-tray class="mr-1.5 h-4 w-4" />
+                    Download Profile PDF
+                </a>
             </div>
 
             <div class="space-y-6">
@@ -86,7 +88,7 @@
                     {{ __('Close') }}
                 </x-secondary-button>
 
-                <x-primary-button type="button" x-on:click="$dispatch('close-modal', { name: 'supplier-detail-modal' }); $dispatch('edit-supplier', { supplier: {{ $supplier->id }} })" class="bg-amber-500 hover:bg-amber-600 focus:ring-amber-500">
+                <x-primary-button href="{{ route('suppliers.edit', $supplier) }}" class="bg-amber-500 hover:bg-amber-600 focus:ring-amber-500">
                     <x-heroicon-o-pencil-square class="w-4 h-4 mr-2" />
                     {{ __('Edit Supplier') }}
                 </x-primary-button>

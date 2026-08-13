@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Cache;
 
 class UnitController extends Controller
 {
@@ -13,21 +12,21 @@ class UnitController extends Controller
     {
         $query = $request->input('q');
 
-        $units = Cache::rememberForever('units_list_all', function () {
-            return Unit::all()->map(function($unit) {
-                return [
-                    'value' => $unit->id,
-                    'text' => "{$unit->name} ({$unit->symbol})",
-                ];
-            });
-        });
+        $units = Unit::query()
+            ->when($query, function ($builder) use ($query) {
+                $builder->where(function ($search) use ($query) {
+                    $search->where('name', 'like', "%{$query}%")
+                        ->orWhere('symbol', 'like', "%{$query}%");
+                });
+            })
+            ->orderBy('name')
+            ->limit(20)
+            ->get(['id', 'name', 'symbol'])
+            ->map(fn (Unit $unit) => [
+                'value' => $unit->id,
+                'text' => "{$unit->name} ({$unit->symbol})",
+            ]);
 
-        if ($query) {
-            $units = $units->filter(function ($item) use ($query) {
-                return stripos($item['text'], $query) !== false;
-            });
-        }
-
-        return response()->json($units->values()->take(20));
+        return response()->json($units);
     }
 }

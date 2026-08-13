@@ -12,9 +12,14 @@ class CompanyController extends Controller
     public function search(Request $request): JsonResponse
     {
         $query = (string) $request->input('q', $request->input('search', ''));
+        $supplierId = $request->integer('supplier_id');
 
         $companies = Company::query()
             ->active()
+            ->when($supplierId, fn ($builder) => $builder->whereHas(
+                'suppliers',
+                fn ($supplierQuery) => $supplierQuery->where('suppliers.id', $supplierId)
+            ))
             ->when($query !== '', function ($builder) use ($query) {
                 $builder->where(function ($subQuery) use ($query) {
                     $subQuery->where('company_code', 'like', "%{$query}%")

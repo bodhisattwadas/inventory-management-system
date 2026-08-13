@@ -56,9 +56,13 @@ class SupplierForm extends Component
     public bool $isEditing = false;
     public bool $asPage = false;
 
-    public function mount(bool $asPage = false): void
+    public function mount(bool $asPage = false, ?Supplier $supplier = null): void
     {
         $this->asPage = $asPage;
+
+        if ($supplier) {
+            $this->fillFromSupplier($supplier);
+        }
     }
 
     protected function rules(): array
@@ -120,6 +124,12 @@ class SupplierForm extends Component
     public function edit(Supplier $supplier): void
     {
         $this->resetValidation();
+        $this->fillFromSupplier($supplier);
+        $this->dispatch('open-modal', name: 'supplier-modal');
+    }
+
+    private function fillFromSupplier(Supplier $supplier): void
+    {
         $this->supplier = $supplier;
         $supplier->load('companies');
 
@@ -135,7 +145,6 @@ class SupplierForm extends Component
         $this->company_ids = $supplier->companies->pluck('id')->all();
 
         $this->isEditing = true;
-        $this->dispatch('open-modal', name: 'supplier-modal');
     }
 
     public function save(SupplierService $service): void
