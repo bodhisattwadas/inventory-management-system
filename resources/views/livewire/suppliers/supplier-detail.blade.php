@@ -77,8 +77,8 @@
                         <p class="text-sm font-medium">{{ $supplier->bank_name ?: '-' }}</p>
                     </div>
                     <div>
-                        <x-input-label value="{{ __('Account Number') }}" hint="Masked supplier bank account number. Example: XXXXXXXX9012." class="text-muted-foreground" />
-                        <p class="text-sm font-medium">{{ $supplier->masked_account_number ?: '-' }}</p>
+                        <x-input-label value="{{ __('Account Number') }}" hint="Full supplier bank account number. Example: 123456789012." class="text-muted-foreground" />
+                        <p class="text-sm font-medium">{{ $supplier->full_account_number ?: '-' }}</p>
                     </div>
                     <div>
                         <x-input-label value="{{ __('IFSC') }}" hint="Indian bank routing code. Example: HDFC0001234." class="text-muted-foreground" />

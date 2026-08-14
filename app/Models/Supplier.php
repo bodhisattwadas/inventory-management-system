@@ -80,6 +80,19 @@ class Supplier extends Model
         return $this->account_number_last4 ? 'XXXXXXXX' . $this->account_number_last4 : null;
     }
 
+    public function getFullAccountNumberAttribute(): ?string
+    {
+        if (blank($this->account_number_encrypted)) {
+            return null;
+        }
+
+        try {
+            return Crypt::decryptString($this->account_number_encrypted);
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
     public function purchases(): HasMany
     {
         return $this->hasMany(Purchase::class);
