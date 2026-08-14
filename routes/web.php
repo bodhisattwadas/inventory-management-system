@@ -47,6 +47,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('purchases', PurchaseController::class);
     Route::prefix('purchases/{purchase}')->name('purchases.')->controller(PurchaseController::class)->group(function () {
         Route::get('print', 'print')->name('print');
+        Route::get('receive', 'receive')->name('receive');
         Route::patch('ordered', 'markOrdered')->name('mark-ordered');
         Route::patch('received', 'markReceived')->name('mark-received');
         Route::patch('paid', 'markPaid')->name('mark-paid');

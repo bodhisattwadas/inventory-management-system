@@ -1,0 +1,190 @@
+<x-app-layout title="Receive Purchase Order">
+    @php
+        $supplierAddress = collect([
+            $purchase->supplier?->address_line_1,
+            $purchase->supplier?->address_line_2,
+            $purchase->supplier?->city,
+            $purchase->supplier?->state,
+            $purchase->supplier?->postal_code,
+            $purchase->supplier?->country,
+        ])->filter()->join(', ') ?: ($purchase->supplier?->address ?: '-');
+    @endphp
+
+    <x-slot name="header">
+        <div class="flex items-center justify-between gap-4">
+            <div>
+                <h2 class="font-semibold text-xl text-foreground leading-tight">
+                    {{ __('Receive Purchase Order') }} #{{ $purchase->invoice_number ?: $purchase->id }}
+                </h2>
+                <p class="mt-1 text-sm text-gray-500">Confirm received quantities, proof image, and final receipt details.</p>
+            </div>
+            <a href="{{ route('purchases.show', $purchase) }}" class="inline-flex h-8 items-center justify-center gap-1.5 rounded border border-gray-300 bg-white px-3 text-xs font-semibold text-gray-700 hover:bg-gray-50">
+                <x-heroicon-o-arrow-left class="h-4 w-4" />
+                {{ __('Back') }}
+            </a>
+        </div>
+    </x-slot>
+
+    <div class="py-4">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <form
+                action="{{ route('purchases.mark-received', $purchase) }}"
+                method="POST"
+                enctype="multipart/form-data"
+                x-data="{
+                    submitting: false,
+                    items: [
+                        @foreach($purchase->items as $item)
+                            {
+                                id: {{ $item->id }},
+                                ordered: {{ (int) $item->quantity }},
+                                received: {{ (int) old('items.'.$item->id.'.received_quantity', $item->received_quantity ?? $item->quantity) }},
+                                unitPrice: {{ (int) $item->unit_price }},
+                                mrp: {{ (int) ($item->selling_price ?: $item->unit_price) }},
+                            },
+                        @endforeach
+                    ],
+                    lineTotal(item) {
+                        return (parseInt(item.received) || 0) * (parseInt(item.unitPrice) || 0);
+                    },
+                    get total() {
+                        return this.items.reduce((sum, item) => sum + this.lineTotal(item), 0);
+                    }
+                }"
+                @submit="submitting = true"
+                class="space-y-6"
+            >
+                @csrf
+                @method('PATCH')
+
+                <div class="grid grid-cols-1 gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4 md:grid-cols-4">
+                    <div>
+                        <div class="text-xs font-medium uppercase text-gray-500">PO Reference</div>
+                        <div class="mt-1 text-sm font-semibold text-gray-900">{{ $purchase->invoice_number ?: '-' }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs font-medium uppercase text-gray-500">Supplier / Vendor</div>
+                        <div class="mt-1 text-sm font-semibold text-gray-900">{{ $purchase->supplier->name ?? '-' }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs font-medium uppercase text-gray-500">PO Date</div>
+                        <div class="mt-1 text-sm font-semibold text-gray-900">{{ $purchase->purchase_date?->format('d/m/Y') }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs font-medium uppercase text-gray-500">Required Delivery Date</div>
+                        <div class="mt-1 text-sm font-semibold text-gray-900">{{ $purchase->due_date?->format('d/m/Y') ?: '-' }}</div>
+                    </div>
+                </div>
+
+                <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+                    <h3 class="text-base font-semibold text-gray-900">{{ __('Order From / Supplier') }}</h3>
+                    <p class="mt-1 text-sm text-gray-500">{{ __('Supplier details for receiving this purchase order.') }}</p>
+                    <div class="mt-4 grid grid-cols-1 gap-3 text-sm text-slate-700 md:grid-cols-2 lg:grid-cols-3">
+                        <p class="font-semibold text-gray-900">{{ $purchase->supplier->name ?? '-' }}</p>
+                        <p><span class="font-medium text-gray-500">{{ __('Contact') }}:</span> {{ $purchase->supplier->contact_person ?: '-' }}</p>
+                        <p><span class="font-medium text-gray-500">{{ __('Phone') }}:</span> {{ $purchase->supplier->phone ?: '-' }}</p>
+                        <p><span class="font-medium text-gray-500">{{ __('Email') }}:</span> {{ $purchase->supplier->email ?: '-' }}</p>
+                        <p><span class="font-medium text-gray-500">{{ __('GST / Tax ID') }}:</span> {{ $purchase->supplier->tax_id ?: '-' }}</p>
+                        <p class="md:col-span-2 lg:col-span-3"><span class="font-medium text-gray-500">{{ __('Address') }}:</span> {{ $supplierAddress }}</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4 rounded-lg border border-gray-200 bg-white p-4 md:grid-cols-2">
+                    @unless($purchase->invoice_number)
+                        <div class="space-y-2">
+                            <x-input-label for="invoice_number" :value="__('Final Invoice Number')" required hint="Supplier invoice number received with the goods. Example: INV-2026-001." />
+                            <x-text-input id="invoice_number" name="invoice_number" :value="old('invoice_number')" required placeholder="INV...." />
+                            <x-input-error :messages="$errors->get('invoice_number')" class="mt-2" />
+                        </div>
+                    @endunless
+
+                    <div class="space-y-2">
+                        <x-input-label for="proof_image" :value="__('Proof Receipt Image')" hint="Optional image proof for received goods or supplier invoice. Example: invoice-photo.jpg." />
+                        <input
+                            id="proof_image"
+                            type="file"
+                            name="proof_image"
+                            accept="image/*"
+                            class="block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700 hover:file:bg-indigo-100"
+                        />
+                        @if($purchase->proof_image)
+                            <a href="{{ Storage::url($purchase->proof_image) }}" target="_blank" class="inline-flex items-center gap-1 text-sm text-indigo-600 hover:underline">
+                                <x-heroicon-o-paper-clip class="h-4 w-4" />
+                                View current proof image
+                            </a>
+                        @else
+                            <p class="text-xs text-gray-500">Optional image (JPG, PNG) max 2MB.</p>
+                        @endif
+                        <x-input-error :messages="$errors->get('proof_image')" class="mt-2" />
+                    </div>
+                </div>
+
+                <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Product</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Brand</th>
+                                    <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">Ordered</th>
+                                    <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">Received</th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">MRP</th>
+                                    <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">Discount %</th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Unit Price</th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Received Total</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 bg-white">
+                                @foreach($purchase->items as $item)
+                                    @php
+                                        $mrp = (int) ($item->selling_price ?: $item->unit_price);
+                                        $discount = $mrp > 0 ? round((1 - ((int) $item->unit_price / $mrp)) * 100, 2) : 0;
+                                    @endphp
+                                    <tr>
+                                        <td class="px-4 py-3">
+                                            <div class="text-sm font-medium text-gray-900">{{ $item->product->name ?? '-' }}</div>
+                                            <div class="text-xs text-gray-500">{{ $item->product->sku ?? $item->product->code ?? '' }}</div>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-gray-700">{{ $item->product->company->short_name ?? $item->product->company->company_name ?? '-' }}</td>
+                                        <td class="px-4 py-3 text-center text-sm font-medium">{{ $item->quantity }}</td>
+                                        <td class="px-4 py-3 text-center">
+                                            <input type="number" name="items[{{ $item->id }}][received_quantity]" x-model.number="items[{{ $loop->index }}].received" min="0" class="w-24 rounded-md border-gray-300 text-center text-sm">
+                                            <x-input-error :messages="$errors->get('items.'.$item->id.'.received_quantity')" class="mt-1" />
+                                        </td>
+                                        <td class="px-4 py-3 text-right text-sm">{{ format_money($mrp) }}</td>
+                                        <td class="px-4 py-3 text-center text-sm">{{ number_format($discount, 2) }}%</td>
+                                        <td class="px-4 py-3 text-right text-sm">{{ format_money($item->unit_price) }}</td>
+                                        <td class="px-4 py-3 text-right text-sm font-semibold" x-text="window.formatMoney(lineTotal(items[{{ $loop->index }}]))"></td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                            <tfoot class="bg-gray-50">
+                                <tr>
+                                    <td colspan="7" class="px-4 py-4 text-right font-bold">Total Received Value</td>
+                                    <td class="px-4 py-4 text-right text-lg font-bold text-green-600" x-text="window.formatMoney(total)"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-3 border-t border-gray-200 pt-6">
+                    <a href="{{ route('purchases.show', $purchase) }}" class="inline-flex h-10 items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        {{ __('Cancel') }}
+                    </a>
+                    <x-primary-button
+                        class="!bg-green-600 hover:!bg-green-700 focus:!ring-green-500"
+                        x-bind:class="submitting ? 'opacity-75 cursor-not-allowed' : ''"
+                        x-bind:disabled="submitting"
+                    >
+                        <svg x-show="submitting" class="-ml-1 mr-2 h-4 w-4 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        {{ __('Confirm Receipt') }}
+                    </x-primary-button>
+                </div>
+            </form>
+        </div>
+    </div>
+</x-app-layout>

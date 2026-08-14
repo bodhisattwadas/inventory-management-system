@@ -116,9 +116,9 @@ class PurchaseService
         });
     }
 
-    public function markAsReceived(Purchase $purchase): void
+    public function markAsReceived(Purchase $purchase, array $receivedQuantities = []): void
     {
-        DB::transaction(function () use ($purchase) {
+        DB::transaction(function () use ($purchase, $receivedQuantities) {
             if (!in_array($purchase->status, [PurchaseStatus::ORDERED, PurchaseStatus::DRAFT])) {
                 throw PurchaseException::invalidStatus('receive', $purchase->status->label(), ['id' => $purchase->id]);
             }
@@ -127,18 +127,23 @@ class PurchaseService
                 throw PurchaseException::missingReference('PO Reference', ['id' => $purchase->id]);
             }
 
-            // Enforce Proof Image
-            if (empty($purchase->proof_image)) {
-                throw PurchaseException::missingReference('Proof Image', ['id' => $purchase->id]);
-            }
-
             // Update Stock
             foreach ($purchase->items as $item) {
+                $receivedQuantity = array_key_exists($item->id, $receivedQuantities)
+                    ? (int) $receivedQuantities[$item->id]
+                    : (int) $item->quantity;
+
+                if ($receivedQuantity < 0) {
+                    throw PurchaseException::updateFailed("Received quantity cannot be negative.", ['item_id' => $item->id]);
+                }
+
+                $item->update(['received_quantity' => $receivedQuantity]);
+
                 // Lock the product row for update to prevent race conditions
                 $product = Product::where('id', $item->product_id)->lockForUpdate()->first();
 
                 if ($product) {
-                    $product->increment('quantity', $item->quantity);
+                    $product->increment('quantity', $receivedQuantity);
 
                     // Update latest purchase price and selling price
                     $updateData = ['purchase_price' => $item->unit_price];
@@ -190,10 +195,6 @@ class PurchaseService
             // Strict Validation for Payment
             if (empty($purchase->invoice_number)) {
                 throw PurchaseException::missingReference('PO Reference', ['id' => $purchase->id]);
-            }
-
-            if (empty($purchase->proof_image)) {
-                throw PurchaseException::missingReference('Proof Image', ['id' => $purchase->id]);
             }
 
             $purchase->update(['status' => PurchaseStatus::PAID]);

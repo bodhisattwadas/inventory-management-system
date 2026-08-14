@@ -95,6 +95,17 @@ class PurchaseController extends Controller
             ->download($filename);
     }
 
+    public function receive(Purchase $purchase)
+    {
+        if ($purchase->status !== PurchaseStatus::ORDERED) {
+            abort(403, 'Only ordered purchase orders can be received.');
+        }
+
+        $purchase->load(['supplier', 'company', 'creator', 'items.product.unit', 'items.product.company']);
+
+        return view('purchases.receive', compact('purchase'));
+    }
+
     public function edit(Purchase $purchase)
     {
         if (!in_array($purchase->status, [PurchaseStatus::DRAFT, PurchaseStatus::ORDERED])) {
@@ -162,20 +173,21 @@ class PurchaseController extends Controller
 
     public function markReceived(Request $request, Purchase $purchase)
     {
-        $rules = [];
+        $purchase->load('items');
+
+        $rules = [
+            'items' => ['required', 'array'],
+            'items.*.received_quantity' => ['required', 'integer', 'min:0'],
+        ];
 
         // Only validate invoice_number if it's not already set on the purchase
         if (empty($purchase->invoice_number)) {
             $rules['invoice_number'] = 'required|string|max:255';
         }
 
-        if (empty($purchase->proof_image)) {
-            $rules['proof_image'] = 'required|image|max:2048'; // 2MB Max
-        }
+        $rules['proof_image'] = ['nullable', 'image', 'max:2048'];
 
-        $request->validate($rules);
-
-        $request->validate($rules);
+        $validated = $request->validate($rules);
 
         try {
             $updateData = [];
@@ -192,14 +204,19 @@ class PurchaseController extends Controller
                 $purchase->update($updateData);
             }
 
-            $this->service->markAsReceived($purchase);
+            $receivedQuantities = collect($validated['items'] ?? [])
+                ->mapWithKeys(fn(array $item, int|string $itemId) => [$itemId => $item['received_quantity']])
+                ->all();
 
-            return back()->with('success', 'Purchase received and stock updated.');
+            $this->service->markAsReceived($purchase, $receivedQuantities);
+
+            return redirect()->route('purchases.show', $purchase)
+                ->with('success', 'Purchase received and stock updated.');
 
         } catch (PurchaseException $e) {
-            return back()->with('error', $e->getMessage());
+            return back()->withInput()->with('error', $e->getMessage());
         } catch (\Exception $e) {
-            return back()->with('error', 'Error receiving purchase: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Error receiving purchase: ' . $e->getMessage());
         }
     }
 
