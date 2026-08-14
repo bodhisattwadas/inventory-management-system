@@ -7,7 +7,10 @@ use App\DTOs\PurchaseData;
 use Illuminate\Http\Request;
 use App\Enums\PurchaseStatus;
 use App\Services\PurchaseService;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use App\Exceptions\PurchaseException;
 use App\Http\Requests\StorePurchaseRequest;
 use App\Http\Requests\UpdatePurchaseRequest;
@@ -28,9 +31,23 @@ class PurchaseController extends Controller
 
     public function create()
     {
+        $purchaseDate = old('purchase_date') ? Carbon::parse(old('purchase_date')) : now();
+
         return view('purchases.create', [
             'purchase' => new Purchase(),
             'statuses' => PurchaseStatus::cases(),
+            'previewPoReference' => $this->service->previewPurchaseOrderReference($purchaseDate),
+        ]);
+    }
+
+    public function previewReference(Request $request)
+    {
+        $validated = $request->validate([
+            'purchase_date' => ['required', 'date'],
+        ]);
+
+        return response()->json([
+            'reference' => $this->service->previewPurchaseOrderReference(Carbon::parse($validated['purchase_date'])),
         ]);
     }
 
@@ -64,6 +81,18 @@ class PurchaseController extends Controller
     {
         $purchase->load(['supplier', 'company', 'creator', 'items.product.unit', 'items.product.company']);
         return view('purchases.show', compact('purchase'));
+    }
+
+    public function print(Purchase $purchase)
+    {
+        $purchase->load(['supplier', 'company', 'creator', 'items.product.unit', 'items.product.company']);
+
+        $reference = $purchase->invoice_number ?: 'PO-'.$purchase->id;
+        $filename = Str::slug($reference).'-purchase-order.pdf';
+
+        return Pdf::loadView('purchases.print', compact('purchase'))
+            ->setPaper('a4')
+            ->download($filename);
     }
 
     public function edit(Purchase $purchase)

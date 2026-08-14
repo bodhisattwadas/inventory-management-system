@@ -19,6 +19,7 @@
                 wire:model="name"
                 placeholder="e.g. Kilogram"
                 required
+                hint="Full unit name. Example: Pieces."
             />
 
             <!-- Symbol -->
@@ -29,6 +30,7 @@
                 wire:model="symbol"
                 placeholder="e.g. kg"
                 required
+                hint="Short unit symbol shown in lists. Example: pcs."
             />
 
             <!-- Actions -->

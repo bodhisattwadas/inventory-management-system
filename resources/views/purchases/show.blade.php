@@ -1,17 +1,57 @@
 <x-app-layout title="Purchase Order Details">
+    @php
+        $storeName = \App\Models\Setting::get('store_name', config('app.name'));
+        $storeAddress = \App\Models\Setting::get('store_address', '-');
+        $storePhone = \App\Models\Setting::get('store_phone', '-');
+        $storeEmail = \App\Models\Setting::get('store_email', '-');
+        $supplierAddress = collect([
+            $purchase->supplier?->address_line_1,
+            $purchase->supplier?->address_line_2,
+            $purchase->supplier?->city,
+            $purchase->supplier?->state,
+            $purchase->supplier?->postal_code,
+            $purchase->supplier?->country,
+        ])->filter()->join(', ') ?: ($purchase->supplier?->address ?: '-');
+    @endphp
+
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-foreground leading-tight">
                 {{ __('Purchase Order Details') }} #{{ $purchase->invoice_number ?: $purchase->id }}
             </h2>
-            <div class="flex items-center gap-2">
-                <x-secondary-button href="{{ route('purchases.index') }}">
-                    &larr; {{ __('Back to List') }}
-                </x-secondary-button>
+            <div class="flex flex-wrap items-center gap-2">
+                <a href="{{ route('purchases.index') }}" class="inline-flex h-8 items-center justify-center gap-1.5 rounded border border-gray-300 bg-white px-3 text-xs font-semibold text-gray-700 hover:bg-gray-50">
+                    <x-heroicon-o-arrow-left class="h-4 w-4" />
+                    {{ __('Back') }}
+                </a>
                 @if(in_array($purchase->status, [\App\Enums\PurchaseStatus::DRAFT, \App\Enums\PurchaseStatus::ORDERED]))
-                    <x-secondary-button href="{{ route('purchases.edit', $purchase) }}">
+                    <a href="{{ route('purchases.edit', $purchase) }}" class="inline-flex h-8 items-center justify-center gap-1.5 rounded bg-blue-600 px-3 text-xs font-semibold text-white hover:bg-blue-700">
+                        <x-heroicon-o-pencil-square class="h-4 w-4" />
                         {{ __('Edit') }}
-                    </x-secondary-button>
+                    </a>
+                @endif
+                @if($purchase->status === \App\Enums\PurchaseStatus::ORDERED)
+                    <button type="button" x-data x-on:click="$dispatch('open-receive-modal')" class="inline-flex h-8 items-center justify-center gap-1.5 rounded bg-green-600 px-3 text-xs font-semibold text-white hover:bg-green-700">
+                        <x-heroicon-o-inbox-arrow-down class="h-4 w-4" />
+                        {{ __('Receive') }}
+                    </button>
+                @endif
+                <a href="{{ route('purchases.print', $purchase) }}" class="inline-flex h-8 items-center justify-center gap-1.5 rounded border border-gray-300 bg-white px-3 text-xs font-semibold text-gray-700 hover:bg-gray-50">
+                    <x-heroicon-o-arrow-down-tray class="h-4 w-4" />
+                    {{ __('Download PDF') }}
+                </a>
+                @if($purchase->status === \App\Enums\PurchaseStatus::ORDERED)
+                    <button type="button" x-data x-on:click="$dispatch('open-purchase-confirmation', {
+                        url: '{{ route('purchases.cancel', $purchase) }}',
+                        method: 'PATCH',
+                        title: 'Cancel Purchase Order',
+                        message: 'Are you sure you want to cancel this purchase order?',
+                        buttonText: 'Cancel',
+                        buttonClass: '!bg-red-600 hover:!bg-red-700 focus:!ring-red-500'
+                    })" class="inline-flex h-8 items-center justify-center gap-1.5 rounded bg-red-600 px-3 text-xs font-semibold text-white hover:bg-red-700">
+                        <x-heroicon-o-x-circle class="h-4 w-4" />
+                        {{ __('Cancel') }}
+                    </button>
                 @endif
             </div>
         </div>
@@ -19,6 +59,35 @@
 
     <div class="py-4">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden border border-gray-200">
+                    <div class="p-6">
+                        <h3 class="text-lg font-medium text-gray-900">{{ $storeName }}</h3>
+                        <p class="mt-1 text-sm text-gray-500">{{ __('Store details used on the purchase order PDF.') }}</p>
+                        <div class="mt-4 space-y-2 text-sm text-slate-700">
+                            <p><span class="font-medium text-gray-500">{{ __('Address') }}:</span> {{ $storeAddress }}</p>
+                            <p><span class="font-medium text-gray-500">{{ __('Phone') }}:</span> {{ $storePhone }}</p>
+                            <p><span class="font-medium text-gray-500">{{ __('Email') }}:</span> {{ $storeEmail }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden border border-gray-200">
+                    <div class="p-6">
+                        <h3 class="text-lg font-medium text-gray-900">{{ __('Order From / Supplier') }}</h3>
+                        <p class="mt-1 text-sm text-gray-500">{{ __('Supplier details included on the purchase order PDF.') }}</p>
+                        <div class="mt-4 space-y-2 text-sm text-slate-700">
+                            <p class="font-semibold text-gray-900">{{ $purchase->supplier->name ?? '-' }}</p>
+                            <p><span class="font-medium text-gray-500">{{ __('Contact') }}:</span> {{ $purchase->supplier->contact_person ?: '-' }}</p>
+                            <p><span class="font-medium text-gray-500">{{ __('Phone') }}:</span> {{ $purchase->supplier->phone ?: '-' }}</p>
+                            <p><span class="font-medium text-gray-500">{{ __('Email') }}:</span> {{ $purchase->supplier->email ?: '-' }}</p>
+                            <p><span class="font-medium text-gray-500">{{ __('GST / Tax ID') }}:</span> {{ $purchase->supplier->tax_id ?: '-' }}</p>
+                            <p><span class="font-medium text-gray-500">{{ __('Address') }}:</span> {{ $supplierAddress }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Main Info Card -->
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden border border-gray-200">
                 <div class="p-6">
@@ -174,6 +243,19 @@
                 confirmButtonText: '',
                 confirmButtonClass: '',
 
+                init() {
+                    window.addEventListener('open-purchase-confirmation', event => {
+                        this.confirmAction(
+                            event.detail.url,
+                            event.detail.method,
+                            event.detail.title,
+                            event.detail.message,
+                            event.detail.buttonText,
+                            event.detail.buttonClass
+                        );
+                    });
+                },
+
                 confirmAction(url, method, title, message, btnText, btnClass) {
                     // Manual DOM manipulation to ensure reliability
                     document.getElementById('confirmation-form').action = url;
@@ -187,43 +269,37 @@
                 }
             }" class="flex flex-col sm:flex-row justify-end gap-4">
 
-                @if($purchase->status === \App\Enums\PurchaseStatus::DRAFT)
+                <div class="flex flex-wrap items-center justify-end gap-2">
+                    <a href="{{ route('purchases.index') }}" class="inline-flex h-8 items-center justify-center gap-1.5 rounded border border-gray-300 bg-white px-3 text-xs font-semibold text-gray-700 hover:bg-gray-50">
+                        <x-heroicon-o-arrow-left class="h-4 w-4" />
+                        {{ __('Back') }}
+                    </a>
+                    @if(in_array($purchase->status, [\App\Enums\PurchaseStatus::DRAFT, \App\Enums\PurchaseStatus::ORDERED]))
+                        <a href="{{ route('purchases.edit', $purchase) }}" class="inline-flex h-8 items-center justify-center gap-1.5 rounded bg-blue-600 px-3 text-xs font-semibold text-white hover:bg-blue-700">
+                            <x-heroicon-o-pencil-square class="h-4 w-4" />
+                            {{ __('Edit') }}
+                        </a>
+                    @endif
+                    @if($purchase->status === \App\Enums\PurchaseStatus::ORDERED)
+                        <button type="button" @click="$dispatch('open-receive-modal')" class="inline-flex h-8 items-center justify-center gap-1.5 rounded bg-green-600 px-3 text-xs font-semibold text-white hover:bg-green-700">
+                            <x-heroicon-o-inbox-arrow-down class="h-4 w-4" />
+                            {{ __('Receive') }}
+                        </button>
+                    @endif
+                    <a href="{{ route('purchases.print', $purchase) }}" class="inline-flex h-8 items-center justify-center gap-1.5 rounded border border-gray-300 bg-white px-3 text-xs font-semibold text-gray-700 hover:bg-gray-50">
+                        <x-heroicon-o-arrow-down-tray class="h-4 w-4" />
+                        {{ __('Download PDF') }}
+                    </a>
+                    @if($purchase->status === \App\Enums\PurchaseStatus::ORDERED)
+                        <button type="button" @click="confirmAction('{{ route('purchases.cancel', $purchase) }}', 'PATCH', 'Cancel Purchase Order', 'Are you sure you want to cancel this purchase order?', 'Cancel', '!bg-red-600 hover:!bg-red-700 focus:!ring-red-500')" class="inline-flex h-8 items-center justify-center gap-1.5 rounded bg-red-600 px-3 text-xs font-semibold text-white hover:bg-red-700">
+                            <x-heroicon-o-x-circle class="h-4 w-4" />
+                            {{ __('Cancel') }}
+                        </button>
+                    @endif
+                </div>
 
-                    {{-- Delete Action --}}
-                    <x-danger-button
-                        type="button"
-                        @click="confirmAction('{{ route('purchases.destroy', $purchase) }}', 'DELETE', 'Delete Draft', 'Are you sure you want to delete this draft? This action cannot be undone.', 'Delete Draft', '!bg-red-600 hover:!bg-red-700 focus:!ring-red-500')"
-                    >
-                        {{ __('Delete Draft') }}
-                    </x-danger-button>
-
-                    {{-- Order Action --}}
-                    <x-primary-button
-                        type="button"
-                        class="!bg-sky-600 hover:!bg-sky-700 focus:!ring-sky-500"
-                        @click="confirmAction('{{ route('purchases.mark-ordered', $purchase) }}', 'PATCH', 'Mark as Ordered', 'Are you sure you want to mark this purchase as ordered? The stock will not be updated until items are received.', 'Mark as Ordered', '!bg-sky-600 hover:!bg-sky-700 focus:!ring-sky-500')"
-                    >
-                        {{ __('Mark as Ordered') }}
-                    </x-primary-button>
-
-                @elseif($purchase->status === \App\Enums\PurchaseStatus::ORDERED)
-
-                    {{-- Cancel Action --}}
-                    <x-secondary-button
-                        type="button"
-                        class="text-red-600 hover:bg-red-50 border-red-200"
-                        @click="confirmAction('{{ route('purchases.cancel', $purchase) }}', 'PATCH', 'Cancel Order', 'Are you sure you want to cancel this order?', 'Cancel Order', '!bg-red-600 hover:!bg-red-700 focus:!ring-red-500')"
-                    >
-                        {{ __('Cancel Order') }}
-                    </x-secondary-button>
-
-                    {{-- Receive Action Trigger (Modal) --}}
-                    <div x-data="{ open: @if($errors->has('invoice_number') || $errors->has('proof_image')) true @else false @endif }">
-                        <x-primary-button @click="open = true" class="!bg-green-600 hover:!bg-green-700 focus:!ring-green-500">
-                            <x-heroicon-o-check-circle class="w-5 h-5 mr-1" />
-                            {{ __('Receive Items') }}
-                        </x-primary-button>
-
+                @if($purchase->status === \App\Enums\PurchaseStatus::ORDERED)
+                    <div x-data="{ open: @if($errors->has('invoice_number') || $errors->has('proof_image')) true @else false @endif }" x-on:open-receive-modal.window="open = true">
                         <!-- Modal Backdrop -->
                         <div x-show="open"
                              style="display: none;"
@@ -253,12 +329,12 @@
                                         <!-- Invoice Section -->
                                         @if($purchase->invoice_number)
                                             <div class="bg-gray-50 p-3 rounded-md border border-gray-200">
-                                                <span class="block text-xs font-medium text-gray-500 uppercase">Invoice Number</span>
+                                                <span class="block text-xs font-medium text-gray-500 uppercase">PO Reference</span>
                                                 <span class="text-sm font-semibold text-gray-900">{{ $purchase->invoice_number }}</span>
                                             </div>
                                         @else
                                             <div class="space-y-2">
-                                                <x-input-label for="invoice_number" :value="__('Final Invoice Number')" required />
+                                                <x-input-label for="invoice_number" :value="__('Final Invoice Number')" required hint="Supplier invoice number received with the goods. Example: INV-2026-001." />
                                                 <x-text-input
                                                     id="invoice_number"
                                                     name="invoice_number"
@@ -281,7 +357,7 @@
                                             </div>
                                         @else
                                             <div class="space-y-2">
-                                                <x-input-label for="proof_image" :value="__('Upload Proof of Receipt')" required />
+                                                <x-input-label for="proof_image" :value="__('Upload Proof of Receipt')" required hint="Image proof for received goods or supplier invoice. Example: invoice-photo.jpg." />
                                                 <input
                                                     id="proof_image"
                                                     type="file"
@@ -328,29 +404,6 @@
                             </div>
                         </div>
                     </div>
-
-                @elseif($purchase->status === \App\Enums\PurchaseStatus::RECEIVED)
-
-                    {{-- Pay Action --}}
-                    <x-primary-button
-                        type="button"
-                        class="!bg-emerald-600 hover:!bg-emerald-700 focus:!ring-emerald-500"
-                        @click="confirmAction('{{ route('purchases.mark-paid', $purchase) }}', 'PATCH', 'Mark as Paid', 'Are you sure you want to mark this purchase as paid? This assumes the full amount has been paid.', 'Mark as Paid', '!bg-emerald-600 hover:!bg-emerald-700 focus:!ring-emerald-500')"
-                    >
-                        <x-heroicon-o-currency-dollar class="w-5 h-5 mr-1" />
-                        {{ __('Mark as Paid') }}
-                    </x-primary-button>
-
-                @elseif($purchase->status === \App\Enums\PurchaseStatus::CANCELLED)
-
-                    {{-- Restore Action --}}
-                    <x-secondary-button
-                        type="button"
-                        @click="confirmAction('{{ route('purchases.restore-draft', $purchase) }}', 'PATCH', 'Restore to Draft', 'Restore this purchase to Draft status? You can edit it again.', 'Restore to Draft', '!bg-gray-800 hover:!bg-gray-700 text-white')"
-                    >
-                        {{ __('Restore to Draft') }}
-                    </x-secondary-button>
-
                 @endif
 
                 <!-- Shared Confirmation Modal -->

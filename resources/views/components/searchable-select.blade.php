@@ -12,6 +12,7 @@
     'params' => [],
     'optionValue' => 'value',
     'optionLabel' => 'label',
+    'hint' => null,
 ])
 
 <div
@@ -104,7 +105,7 @@
     {{ $attributes }}
 >
     @if($label)
-        <x-input-label :for="$name" :value="$label" :required="$required" />
+        <x-input-label :for="$name" :value="$label" :required="$required" :hint="$hint" />
     @endif
 
     <div class="relative">

@@ -13,7 +13,7 @@
         <form wire:submit="save" class="space-y-4">
             <!-- Label (Readonly) -->
             <div class="space-y-2">
-                <x-input-label for="key" :value="__('Setting Name')" />
+                <x-input-label for="key" :value="__('Setting Name')" hint="Internal key used by the app. Example: currency_symbol." />
                 <div class="px-3 py-2 text-sm font-medium border rounded-md border-input bg-muted/50 text-foreground">
                     {{ $label }}
                 </div>
@@ -21,7 +21,7 @@
 
             <!-- Value -->
             <div class="space-y-2">
-                <x-input-label for="value" :value="__('Value')" />
+                <x-input-label for="value" :value="__('Value')" hint="Current setting value. Example: INR." />
                 
                 @if($key === 'currency_position')
                     <select id="value" wire:model="value" class="block w-full rounded-md border-input bg-background shadow-sm focus:border-ring focus:ring-ring sm:text-sm">

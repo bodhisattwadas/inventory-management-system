@@ -75,6 +75,8 @@ final class PurchaseTable extends PowerGridComponent
         return [
             Column::make('ID', 'id')->hidden(),
 
+            Column::action(''),
+
             Column::make('PO Reference', 'invoice_number')
                 ->searchable()
                 ->sortable(),
@@ -105,8 +107,6 @@ final class PurchaseTable extends PowerGridComponent
 
             Column::make('Created By', 'creator_name', 'created_by')
                 ->sortable(),
-
-            Column::action('Action'),
         ];
     }
 

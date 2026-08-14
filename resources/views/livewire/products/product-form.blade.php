@@ -13,7 +13,7 @@
         <form wire:submit="save" class="space-y-6">
 
             <div class="space-y-2">
-                <x-input-label for="image" value="Product Image" />
+                <x-input-label for="image" value="Product Image" hint="Image shown in product lists and detail views. Example: front-pack.jpg." />
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
                     <div class="h-24 w-24 overflow-hidden rounded-md border border-gray-200 bg-gray-50">
                         @if($image)
@@ -52,6 +52,7 @@
                         readonly
                         placeholder="e.g. SKU-1234-ABCD"
                         class="bg-muted text-muted-foreground cursor-not-allowed"
+                        hint="Unique product code used for tracking. Example: SKU-1234-ABCD."
                     />
                 @else
                     <!-- SKU Auto Generated -->
@@ -69,6 +70,7 @@
                     wire:model="name"
                     required
                     class="{{ !$isEditing ? 'col-span-2' : '' }}"
+                    hint="Customer-readable product name. Example: Matte Lipstick Ruby Red."
                 />
             </div>
 
@@ -76,7 +78,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Brand -->
                 <div class="space-y-2">
-                    <x-input-label for="company_id" :value="__('Brand')" required />
+                    <x-input-label for="company_id" :value="__('Brand')" required hint="Brand or company this product belongs to. Example: Colorbar." />
                     <div wire:ignore>
                         <x-tom-select
                             id="company_id"
@@ -93,7 +95,7 @@
 
                 <!-- Category -->
                 <div class="space-y-2">
-                    <x-input-label for="category_id" :value="__('Category')" required />
+                    <x-input-label for="category_id" :value="__('Category')" required hint="Product grouping for filtering and reports. Example: Lip Makeup." />
                     <div wire:ignore>
                         <x-tom-select
                             id="category_id"
@@ -110,7 +112,7 @@
 
                 <!-- Unit -->
                 <div class="space-y-2">
-                    <x-input-label for="unit_id" :value="__('Unit')" required />
+                    <x-input-label for="unit_id" :value="__('Unit')" required hint="Measurement unit used for quantities. Example: pcs." />
                     <div wire:ignore>
                         <x-tom-select
                             id="unit_id"
@@ -129,7 +131,7 @@
             <!-- MRP -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-2">
-                    <x-input-label for="mrp" :value="__('MRP') . ' (' . \App\Models\Setting::get('currency_symbol', 'Rp') . ')'" />
+                    <x-input-label for="mrp" :value="__('MRP') . ' (' . \App\Models\Setting::get('currency_symbol', 'Rp') . ')'" hint="Maximum retail price before discounts. Example: 999." />
                     <x-currency-input
                         id="mrp"
                         wire:model.live.debounce.500ms="mrp"
@@ -151,6 +153,7 @@
                     min="0"
                     placeholder="0"
                     required
+                    hint="Reorder alert level for inventory. Example: 10."
                 />
 
                 <!-- Is Active -->
@@ -170,7 +173,7 @@
 
             <!-- Description -->
             <div class="space-y-2">
-                <x-input-label for="description" value="Description" />
+                <x-input-label for="description" value="Description" hint="Product details visible to users. Example: Long-wear matte finish." />
                 <textarea
                     id="description"
                     wire:model="description"
@@ -183,7 +186,7 @@
 
             <!-- Notes -->
             <div class="space-y-2">
-                <x-input-label for="notes" value="Internal Notes" />
+                <x-input-label for="notes" value="Internal Notes" hint="Private notes for staff. Example: Supplier revised price in July." />
                 <textarea
                     id="notes"
                     wire:model="notes"

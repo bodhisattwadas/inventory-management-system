@@ -6,19 +6,19 @@
             </div>
 
             <div class="space-y-2 md:col-span-2">
-                <x-input-label for="current_password" :value="__('Current Password')" />
+                <x-input-label for="current_password" :value="__('Current Password')" hint="Your existing login password. Example: the password you use today." />
                 <x-text-input wire:model="current_password" id="current_password" name="current_password" type="password" class="block w-full" autocomplete="current-password" />
                 <x-input-error :messages="$errors->get('current_password')" />
             </div>
 
             <div class="space-y-2">
-                <x-input-label for="password" :value="__('New Password')" />
+                <x-input-label for="password" :value="__('New Password')" hint="A strong replacement password. Example: use at least 8 characters." />
                 <x-text-input wire:model="password" id="password" name="password" type="password" class="block w-full" autocomplete="new-password" />
                 <x-input-error :messages="$errors->get('password')" />
             </div>
 
             <div class="space-y-2">
-                <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+                <x-input-label for="password_confirmation" :value="__('Confirm Password')" hint="Repeat the new password to avoid typing errors. Example: same as New Password." />
                 <x-text-input wire:model="password_confirmation" id="password_confirmation" name="password_confirmation" type="password" class="block w-full" autocomplete="new-password" />
                 <x-input-error :messages="$errors->get('password_confirmation')" />
             </div>

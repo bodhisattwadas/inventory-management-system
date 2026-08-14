@@ -56,7 +56,7 @@ class FinanceTransactionService
                 'transaction_date' => $purchase->purchase_date,
                 'finance_category_id' => $category->id,
                 'amount' => $purchase->total,
-                'description' => 'Purchase Inv: ' . $purchase->invoice_number . ' - ' . ($purchase->supplier->name ?? 'Unknown'),
+                'description' => 'Purchase PO: ' . $purchase->invoice_number . ' - ' . ($purchase->supplier->name ?? 'Unknown'),
                 'external_reference' => $purchase->invoice_number,
                 'created_by' => $purchase->created_by ?? Auth::id() ?? 1,
             ]

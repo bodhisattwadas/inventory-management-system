@@ -19,10 +19,11 @@
                 wire:model="name"
                 placeholder="e.g. Electricity, Employee Salary, Asset Sales"
                 required
+                hint="Finance category name. Example: Office Rent."
             />
 
             <div class="space-y-3">
-                <x-input-label for="type" :value="__('Type')" />
+                <x-input-label for="type" :value="__('Type')" hint="Whether this category is income or expense. Example: Expense." />
                 <div class="grid grid-cols-2 gap-4">
                     <!-- Income Option -->
                     <label class="cursor-pointer">
@@ -47,7 +48,7 @@
 
             <!-- Description -->
             <div class="space-y-2">
-                <x-input-label for="description" :value="__('Description')" />
+                <x-input-label for="description" :value="__('Description')" hint="Notes about when to use this category. Example: Monthly showroom rent." />
                 <textarea
                     id="description"
                     wire:model="description"

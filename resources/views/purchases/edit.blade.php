@@ -30,6 +30,9 @@
                         }))) }},
                         supplier_id: {{ Js::from(old('supplier_id', $purchase->supplier_id)) }},
                         company_id: {{ Js::from(old('company_id', $purchase->company_id)) }},
+                        purchase_date: {{ Js::from(old('purchase_date', $purchase->purchase_date->format('Y-m-d'))) }},
+                        po_reference: {{ Js::from($purchase->invoice_number) }},
+                        is_editing: true,
                         status: {{ Js::from(old('status', $purchase->status->value)) }},
                         errors: {{ Js::from($errors->any() ? $errors->toArray() : []) }}
                     })"

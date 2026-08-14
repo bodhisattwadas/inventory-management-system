@@ -8,6 +8,7 @@ use App\Models\Purchase;
 use App\DTOs\PurchaseData;
 use App\Models\PurchaseItem;
 use App\Enums\PurchaseStatus;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Exceptions\PurchaseException;
 
@@ -23,7 +24,7 @@ class PurchaseService
         return DB::transaction(function () use ($data, $userId) {
             try {
                 $purchase = Purchase::create([
-                    'invoice_number' => $data->invoice_number,
+                    'invoice_number' => $this->generatePurchaseOrderReference($data->purchase_date),
                     'supplier_id' => $data->supplier_id,
                     'company_id' => $data->company_id,
                     'purchase_date' => $data->purchase_date,
@@ -54,7 +55,6 @@ class PurchaseService
                 }
 
                 $purchase->update([
-                    'invoice_number' => $data->invoice_number,
                     'supplier_id' => $data->supplier_id,
                     'company_id' => $data->company_id,
                     'purchase_date' => $data->purchase_date,
@@ -124,7 +124,7 @@ class PurchaseService
             }
 
             if (empty($purchase->invoice_number)) {
-                throw PurchaseException::missingReference('Invoice Number', ['id' => $purchase->id]);
+                throw PurchaseException::missingReference('PO Reference', ['id' => $purchase->id]);
             }
 
             // Enforce Proof Image
@@ -167,7 +167,7 @@ class PurchaseService
                     // Append to Notes if prices changed
                     if ($hasPriceChange) {
                         $timestamp = now()->format('Y-m-d H:i');
-                        $ref = $purchase->invoice_number ? "Invoice #{$purchase->invoice_number}" : "Purchase #{$purchase->id}";
+                        $ref = $purchase->invoice_number ? "PO #{$purchase->invoice_number}" : "Purchase #{$purchase->id}";
                         $logHeader = "\n\n[System Log - {$timestamp}] Price update via {$ref}:";
                         $updateData['notes'] = TRIM(($product->notes ?? '') . $logHeader . $priceChangeLog);
                     }
@@ -189,7 +189,7 @@ class PurchaseService
 
             // Strict Validation for Payment
             if (empty($purchase->invoice_number)) {
-                throw PurchaseException::missingReference('Invoice Number', ['id' => $purchase->id]);
+                throw PurchaseException::missingReference('PO Reference', ['id' => $purchase->id]);
             }
 
             if (empty($purchase->proof_image)) {
@@ -246,5 +246,34 @@ class PurchaseService
         }
 
         $purchase->update(['total' => $total]);
+    }
+
+    public function previewPurchaseOrderReference(?Carbon $purchaseDate = null): string
+    {
+        return $this->generatePurchaseOrderReference($purchaseDate, false);
+    }
+
+    private function generatePurchaseOrderReference(?Carbon $purchaseDate = null, bool $lock = true): string
+    {
+        $prefix = 'PO-'.($purchaseDate ?? now())->format('Ymd').'-';
+        $query = Purchase::query()
+            ->where('invoice_number', 'like', $prefix.'%');
+
+        if ($lock) {
+            $query->lockForUpdate();
+        }
+
+        $lastReference = $query->orderByDesc('invoice_number')->value('invoice_number');
+
+        $nextNumber = $lastReference
+            ? ((int) substr($lastReference, -4)) + 1
+            : 1;
+
+        do {
+            $reference = $prefix.str_pad((string) $nextNumber, 4, '0', STR_PAD_LEFT);
+            $nextNumber++;
+        } while (Purchase::query()->where('invoice_number', $reference)->exists());
+
+        return $reference;
     }
 }

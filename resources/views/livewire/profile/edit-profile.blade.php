@@ -6,7 +6,7 @@
             </div>
 
             <div class="space-y-2 md:col-span-2">
-                <x-input-label for="profile_photo" :value="__('Profile Photo')" />
+                <x-input-label for="profile_photo" :value="__('Profile Photo')" hint="Your account avatar image. Example: profile.jpg." />
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
                     <x-avatar
                         :name="$name"
@@ -29,7 +29,7 @@
             </div>
 
             <div class="space-y-2">
-                <x-input-label for="name" :value="__('Name')" required />
+                <x-input-label for="name" :value="__('Name')" required hint="Your full display name. Example: Priya Sharma." />
                 <x-text-input
                     wire:model="name"
                     id="name"
@@ -44,7 +44,7 @@
             </div>
 
             <div class="space-y-2">
-                <x-input-label for="username" :value="__('Username')" required />
+                <x-input-label for="username" :value="__('Username')" required hint="Your login username. Example: priya." />
                 <x-text-input
                     wire:model="username"
                     id="username"
@@ -58,7 +58,7 @@
             </div>
 
             <div class="space-y-2 md:col-span-2">
-                <x-input-label for="email" :value="__('Email')" required />
+                <x-input-label for="email" :value="__('Email')" required hint="Your login and notification email. Example: priya@example.com." />
                 <x-text-input
                     wire:model="email"
                     id="email"

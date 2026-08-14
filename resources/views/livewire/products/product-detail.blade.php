@@ -30,17 +30,17 @@
                 <!-- Details -->
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div class="space-y-1">
-                        <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('Brand') }}</label>
+                        <x-input-label value="{{ __('Brand') }}" hint="Brand or company this product belongs to. Example: Colorbar." class="text-muted-foreground" />
                         <p class="text-sm text-foreground font-medium">{{ $product->company?->short_name ?: ($product->company?->company_name ?? '-') }}</p>
                     </div>
 
                     <div class="space-y-1">
-                        <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('Category') }}</label>
+                        <x-input-label value="{{ __('Category') }}" hint="Product grouping for filtering and reports. Example: Lip Makeup." class="text-muted-foreground" />
                         <p class="text-sm text-foreground font-medium">{{ $product->category->name ?? '-' }}</p>
                     </div>
 
                     <div class="space-y-1">
-                        <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('Unit') }}</label>
+                        <x-input-label value="{{ __('Unit') }}" hint="Measurement unit used for quantities. Example: pcs." class="text-muted-foreground" />
                         <p class="text-sm text-foreground font-medium">
                             @if($product->unit)
                                 {{ $product->unit->name }} <span class="text-muted-foreground">({{ $product->unit->symbol }})</span>
@@ -51,32 +51,25 @@
                     </div>
 
                     <div class="space-y-1">
-                        <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('MRP') }}</label>
+                        <x-input-label value="{{ __('MRP') }}" hint="Maximum retail price before discounts. Example: 999." class="text-muted-foreground" />
                         <p class="text-sm text-foreground font-medium">@money($product->mrp)</p>
                     </div>
 
                     <div class="space-y-1">
-                        <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('Stock') }}</label>
-                        <p class="text-sm text-foreground font-medium {{ $product->quantity <= $product->min_stock ? 'text-red-500' : '' }}">
-                            {{ $product->quantity . ' ' . ($product->unit->symbol ?? '') }}
-                        </p>
-                    </div>
-
-                    <div class="space-y-1">
-                        <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('Minimum Quantity') }}</label>
+                        <x-input-label value="{{ __('Minimum Quantity') }}" hint="Reorder alert level for inventory. Example: 10." class="text-muted-foreground" />
                         <p class="text-sm text-foreground font-medium">{{ $product->min_stock }}</p>
                     </div>
                 </div>
 
                 <div class="space-y-1">
-                    <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('Description') }}</label>
+                    <x-input-label value="{{ __('Description') }}" hint="Product details visible to users. Example: Long-wear matte finish." class="text-muted-foreground" />
                     <p class="text-sm text-foreground font-medium">
                         {{ $product->description ?: 'No description provided.' }}
                     </p>
                 </div>
 
                 <div class="space-y-1">
-                    <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('Internal Notes') }}</label>
+                    <x-input-label value="{{ __('Internal Notes') }}" hint="Private notes for staff. Example: Supplier revised price in July." class="text-muted-foreground" />
                     <div class="bg-gray-50 border border-secondary p-3 rounded-md">
                         <p class="text-sm text-foreground font-mono whitespace-pre-wrap leading-relaxed">{{ $product->notes ?: 'No notes.' }}</p>
                     </div>

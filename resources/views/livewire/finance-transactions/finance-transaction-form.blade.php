@@ -20,6 +20,7 @@
                     type="date"
                     wire:model="transaction_date"
                     required
+                    hint="Transaction date. Example: 2026-08-14."
                 />
 
                 <!-- Reference -->
@@ -29,12 +30,13 @@
                     placeholder="e.g. INV.001 or Receipt #123"
                     type="text"
                     wire:model="external_reference"
+                    hint="Optional transaction reference code. Example: TXN-1001."
                 />
             </div>
 
             <!-- Type -->
             <div class="space-y-3">
-                <x-input-label for="type" :value="__('Type')" :required="true" />
+                <x-input-label for="type" :value="__('Type')" :required="true" hint="Income or expense transaction. Example: Income." />
                 <div class="grid grid-cols-2 gap-4">
                     <!-- Income Option -->
                     <label class="cursor-pointer">
@@ -67,12 +69,13 @@
                     :options="$categoryOptions"
                     placeholder="Select Category"
                     :required="true"
+                    hint="Finance category for reporting. Example: Sales Revenue."
                 />
             </div>
 
             <!-- Amount -->
             <div class="space-y-2">
-                <x-input-label for="amount" :value="__('Amount') . ' (' . \App\Models\Setting::get('currency_symbol', 'Rp') . ')'" :required="true" />
+                <x-input-label for="amount" :value="__('Amount') . ' (' . \App\Models\Setting::get('currency_symbol', 'Rp') . ')'" :required="true" hint="Transaction amount. Example: 25000." />
                 <x-currency-input
                     id="amount"
                     wire:model.live.debounce.500ms="amount"
@@ -84,7 +87,7 @@
 
             <!-- Description -->
             <div class="space-y-2">
-                <x-input-label for="description" value="Description" />
+                <x-input-label for="description" value="Description" hint="Transaction note or purpose. Example: August rent payment." />
                 <textarea
                     id="description"
                     wire:model="description"

@@ -22,7 +22,7 @@
 
         <form wire:submit="save" class="space-y-4">
             <div class="space-y-2">
-                <x-input-label for="profile_photo" :value="__('Profile Photo')" />
+                <x-input-label for="profile_photo" :value="__('Profile Photo')" hint="User avatar image. Example: manager.jpg." />
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
                     <x-avatar
                         :name="$name ?: 'User'"
@@ -52,6 +52,7 @@
                 wire:model="name"
                 required
                 placeholder="Full Name"
+                hint="User full name. Example: Priya Sharma."
             />
 
             <!-- Username -->
@@ -62,6 +63,7 @@
                 wire:model="username"
                 required
                 placeholder="Unique username"
+                hint="Login username. Example: priya."
             />
 
             <!-- Email -->
@@ -72,10 +74,11 @@
                 wire:model="email"
                 required
                 placeholder="email@example.com"
+                hint="Login and notification email. Example: priya@example.com."
             />
 
             <div class="space-y-2">
-                <x-input-label for="role" :value="__('Role')" required />
+                <x-input-label for="role" :value="__('Role')" required hint="Permission group for this user. Example: Admin." />
                 <select
                     id="role"
                     wire:model="role"
@@ -92,7 +95,7 @@
             <!-- Password -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="space-y-2">
-                    <x-input-label for="password" :value="__('Password')" />
+                    <x-input-label for="password" :value="__('Password')" hint="New login password. Example: Use a strong password." />
                     <x-text-input
                         id="password"
                         name="password"
@@ -106,7 +109,7 @@
                 </div>
 
                 <div class="space-y-2">
-                    <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+                    <x-input-label for="password_confirmation" :value="__('Confirm Password')" hint="Repeat password to avoid typing errors. Example: Same as password." />
                     <x-text-input
                         id="password_confirmation"
                         name="password_confirmation"

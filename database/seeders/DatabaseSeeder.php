@@ -14,15 +14,23 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([
+        $seeders = [
+            // Independent/base data.
             UserSeeder::class,
-            CustomerSeeder::class,
-            SupplierSeeder::class,
             UnitSeeder::class,
             CategorySeeder::class,
-            ProductSeeder::class,
+            BrandCompanySeeder::class,
             FinanceCategorySeeder::class,
             SettingSeeder::class,
-        ]);
+
+            // Data that depends on the base records above.
+            //CustomerSeeder::class,
+            SupplierSeeder::class,
+            ProductSeeder::class,
+        ];
+
+        foreach ($seeders as $seeder) {
+            $this->call($seeder);
+        }
     }
 }

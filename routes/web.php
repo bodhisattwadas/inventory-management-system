@@ -46,6 +46,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Purchases
     Route::resource('purchases', PurchaseController::class);
     Route::prefix('purchases/{purchase}')->name('purchases.')->controller(PurchaseController::class)->group(function () {
+        Route::get('print', 'print')->name('print');
         Route::patch('ordered', 'markOrdered')->name('mark-ordered');
         Route::patch('received', 'markReceived')->name('mark-received');
         Route::patch('paid', 'markPaid')->name('mark-paid');
@@ -81,6 +82,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // =========================================================================
     Route::prefix('ajax')->name('ajax.')->group(function () {
         Route::post('products', [\App\Http\Controllers\Api\ProductController::class, 'search'])->name('products.search');
+        Route::post('purchases/preview-reference', [PurchaseController::class, 'previewReference'])->name('purchases.preview-reference');
         Route::post('suppliers', [\App\Http\Controllers\Api\SupplierController::class, 'search'])->name('suppliers.search');
         Route::post('companies', [\App\Http\Controllers\Api\CompanyController::class, 'search'])->name('companies.search');
         Route::post('customers', [\App\Http\Controllers\Api\CustomerController::class, 'search'])->name('customers.search');

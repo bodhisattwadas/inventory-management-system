@@ -16,4 +16,5 @@
     </div>
 
     <livewire:companies.company-form />
+    <livewire:companies.company-detail />
 </x-app-layout>

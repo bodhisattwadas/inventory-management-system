@@ -1,7 +1,7 @@
 <div class="space-y-6">
     <div class="grid grid-cols-1 gap-6 rounded-lg border border-gray-200 bg-gray-50 p-4 md:grid-cols-2">
         <div class="space-y-2">
-            <x-input-label for="supplier_id" :value="__('Supplier / Vendor')" required />
+            <x-input-label for="supplier_id" :value="__('Supplier / Vendor')" required hint="Supplier for this purchase order. Example: Beauty World Distributors." />
             <select id="supplier_id" name="supplier_id" x-init="initSupplierSelect($el)" x-model="supplier_id" autocomplete="off">
                 <option value=""></option>
                 @if(old('supplier_id'))
@@ -17,26 +17,30 @@
         </div>
 
         <div class="space-y-2">
-            <x-input-label for="invoice_number" :value="__('PO Reference (Optional)')" />
-            <x-text-input id="invoice_number" name="invoice_number" :value="old('invoice_number', $purchase->invoice_number ?? '')" placeholder="Leave empty for draft" />
-            <x-input-error :messages="$errors->get('invoice_number')" />
+            <x-input-label for="invoice_number_display" :value="__('PO Reference')" hint="System-generated purchase order reference. Example: PO-20260814-0001." />
+            <x-text-input
+                id="invoice_number_display"
+                x-bind:value="po_reference || '{{ $purchase->invoice_number ?? __('Auto Generated') }}'"
+                readonly
+                class="bg-muted text-muted-foreground cursor-not-allowed"
+            />
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div class="space-y-2">
-                <x-input-label for="purchase_date" :value="__('PO Date')" required />
-                <x-text-input id="purchase_date" type="date" name="purchase_date" :value="old('purchase_date', $purchase->purchase_date ? \Carbon\Carbon::parse($purchase->purchase_date)->format('Y-m-d') : date('Y-m-d'))" />
+                <x-input-label for="purchase_date" :value="__('PO Date')" required hint="Date the purchase order is created. Example: 2026-08-14." />
+                <x-text-input id="purchase_date" type="date" name="purchase_date" x-model="purchase_date" @change="updatePoReference" />
                 <x-input-error :messages="$errors->get('purchase_date')" />
             </div>
             <div class="space-y-2">
-                <x-input-label for="due_date" :value="__('Expected Delivery')" />
+                <x-input-label for="due_date" :value="__('Expected Delivery')" hint="Expected date for receiving goods. Example: 2026-08-20." />
                 <x-text-input id="due_date" type="date" name="due_date" :value="old('due_date', $purchase->due_date ? \Carbon\Carbon::parse($purchase->due_date)->format('Y-m-d') : '')" />
                 <x-input-error :messages="$errors->get('due_date')" />
             </div>
         </div>
 
         <div class="md:col-span-2 space-y-2">
-            <x-input-label for="notes" :value="__('PO Notes / Terms')" />
+            <x-input-label for="notes" :value="__('PO Notes / Terms')" hint="Purchase terms or delivery instructions. Example: Deliver before 5 PM." />
             <textarea id="notes" name="notes" rows="2" class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" placeholder="Terms, delivery instructions, or vendor notes...">{{ old('notes', $purchase->notes ?? '') }}</textarea>
             <x-input-error :messages="$errors->get('notes')" />
         </div>
@@ -45,7 +49,7 @@
     <div class="space-y-4">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div class="space-y-2">
-                <x-input-label for="company_id" :value="__('Brand')" required />
+                <x-input-label for="company_id" :value="__('Brand')" required hint="Brand to filter available products for this supplier. Example: Colorbar." />
                 <select id="company_id" name="company_id" x-init="initCompanySelect($el)" x-model="company_id" autocomplete="off">
                     <option value=""></option>
                     @if(old('company_id'))
@@ -61,7 +65,7 @@
                 <p class="text-xs text-gray-500">Select a vendor first to load its brands.</p>
             </div>
             <div class="space-y-2 md:col-span-2">
-                <x-input-label for="master_product_search" :value="__('Product Search')" />
+                <x-input-label for="master_product_search" :value="__('Product Search')" hint="Search and add products from product master. Example: Matte Lipstick." />
                 <select id="master_product_search" x-init="initMasterSearch($el)" placeholder="Select a brand first..." autocomplete="off"></select>
             </div>
         </div>
@@ -154,6 +158,9 @@
             })),
             supplier_id: initialData.supplier_id || '',
             company_id: initialData.company_id || '',
+            purchase_date: initialData.purchase_date || '{{ old('purchase_date', $purchase->purchase_date ? \Carbon\Carbon::parse($purchase->purchase_date)->format('Y-m-d') : date('Y-m-d')) }}',
+            po_reference: initialData.po_reference || '',
+            is_editing: initialData.is_editing || false,
             loading: false,
             errors: initialData.errors || {},
 
@@ -210,7 +217,6 @@
                             this.fetchOptions('{{ route("ajax.companies.search") }}', { q: query, supplier_id: this.supplier_id }, callback);
                         },
                         onChange: value => {
-                            if (this.company_id != value) this.items = [];
                             this.company_id = value;
                             this.updateProductSearchState();
                         }
@@ -238,6 +244,31 @@
                 search.settings.placeholder = this.company_id ? 'Search products for selected brand...' : 'Select a brand first...';
                 search.inputState();
                 if (this.company_id) search.load('');
+            },
+
+            updatePoReference() {
+                if (this.is_editing) return;
+
+                if (!this.purchase_date) {
+                    this.po_reference = '';
+                    return;
+                }
+
+                fetch('{{ route("ajax.purchases.preview-reference") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ purchase_date: this.purchase_date })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        this.po_reference = data.reference || '';
+                    })
+                    .catch(() => {
+                        this.po_reference = `PO-${this.purchase_date.replaceAll('-', '')}-0001`;
+                    });
             },
 
             initRemoteSelect(el, url, onChange, placeholder) {

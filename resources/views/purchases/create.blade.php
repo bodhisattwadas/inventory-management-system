@@ -17,6 +17,9 @@
                         items: {{ Js::from(old('items', [])) }},
                         supplier_id: {{ Js::from(old('supplier_id')) }},
                         company_id: {{ Js::from(old('company_id')) }},
+                        purchase_date: {{ Js::from(old('purchase_date', date('Y-m-d'))) }},
+                        po_reference: {{ Js::from($previewPoReference) }},
+                        is_editing: false,
                         status: {{ Js::from(old('status', 'draft')) }},
                         errors: {{ Js::from($errors->any() ? $errors->toArray() : []) }}
                     })"

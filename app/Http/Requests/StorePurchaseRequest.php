@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\Product;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class StorePurchaseRequest extends FormRequest
@@ -43,7 +44,6 @@ class StorePurchaseRequest extends FormRequest
                 Rule::exists('supplier_companies', 'company_id')
                     ->where('supplier_id', $this->input('supplier_id')),
             ],
-            'invoice_number' => ['nullable', 'string', 'max:255', 'unique:purchases,invoice_number'],
             'purchase_date' => ['required', 'date'],
             'due_date' => ['nullable', 'date', 'after_or_equal:purchase_date'],
             'notes' => ['nullable', 'string'],
@@ -51,7 +51,7 @@ class StorePurchaseRequest extends FormRequest
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => [
                 'required',
-                Rule::exists('products', 'id')->where('company_id', $this->input('company_id')),
+                Rule::exists('products', 'id'),
             ],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
             'items.*.discount_percent' => ['required', 'numeric', 'between:0,100'],
@@ -68,7 +68,37 @@ class StorePurchaseRequest extends FormRequest
             'items.*.quantity.min' => 'Quantity must be at least 1.',
             'items.*.discount_percent.between' => 'MRP discount must be between 0% and 100%.',
             'company_id.exists' => 'The selected brand is not supplied by this vendor.',
-            'items.*.product_id.exists' => 'Every product must belong to the selected brand.',
+            'items.*.product_id.exists' => 'Every product must exist in Product Master.',
         ];
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            $supplierCompanyIds = collect(
+                DB::table('supplier_companies')
+                    ->where('supplier_id', $this->input('supplier_id'))
+                    ->pluck('company_id')
+            );
+
+            $productIds = collect($this->input('items', []))
+                ->pluck('product_id')
+                ->filter()
+                ->unique()
+                ->values();
+
+            if ($productIds->isEmpty()) {
+                return;
+            }
+
+            $invalidProducts = Product::query()
+                ->whereIn('id', $productIds)
+                ->whereNotIn('company_id', $supplierCompanyIds)
+                ->exists();
+
+            if ($invalidProducts) {
+                $validator->errors()->add('items', 'Every product must belong to a brand supplied by this vendor.');
+            }
+        });
     }
 }

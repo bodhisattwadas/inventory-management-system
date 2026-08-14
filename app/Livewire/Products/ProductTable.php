@@ -75,7 +75,6 @@ final class ProductTable extends PowerGridComponent
             ->add('category_name', fn(Product $model) => $model->category ? $model->category->name : '-')
             ->add('unit_symbol', fn(Product $model) => $model->unit ? $model->unit->symbol : '-')
             ->add('mrp_formatted', fn(Product $model) => format_money($model->mrp))
-            ->add('quantity')
             ->add('min_stock')
             ->add('is_active_label', function(Product $model) {
                 return $model->is_active
@@ -135,10 +134,6 @@ final class ProductTable extends PowerGridComponent
             Column::make('MRP', 'mrp_formatted', 'mrp')
                 ->sortable()
                 ->bodyAttribute('text-right'),
-
-            Column::make('Qty', 'quantity')
-                ->sortable()
-                ->bodyAttribute('text-center'),
 
             Column::make('Minimum Quantity', 'min_stock')
                 ->sortable()

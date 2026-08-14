@@ -870,6 +870,7 @@
                             x-model="newCust.name"
                             x-ref="nameInput"
                             required
+                            hint="Customer display name. Example: Asha Menon."
                         />
                         <p x-show="errors.name" x-text="errors.name" class="text-sm font-medium text-red-600 mt-1" style="display: none;"></p>
                     </div>
@@ -882,6 +883,7 @@
                                 label="Email"
                                 type="email"
                                 x-model="newCust.email"
+                                hint="Customer email address. Example: asha@example.com."
                             />
                             <p x-show="errors.email" x-text="errors.email" class="text-sm font-medium text-red-600 mt-1" style="display: none;"></p>
                         </div>
@@ -890,6 +892,7 @@
                                 name="new_phone"
                                 label="Phone"
                                 x-model="newCust.phone"
+                                hint="Customer phone number. Example: +91 98765 43210."
                             />
                             <p x-show="errors.phone" x-text="errors.phone" class="text-sm font-medium text-red-600 mt-1" style="display: none;"></p>
                         </div>
@@ -897,7 +900,7 @@
 
                     <!-- Address -->
                     <div class="space-y-2">
-                        <x-input-label for="new_address" :value="__('Address')" />
+                        <x-input-label for="new_address" :value="__('Address')" hint="Customer billing or delivery address. Example: 12 MG Road, Bengaluru." />
                         <textarea
                             id="new_address"
                             x-model="newCust.address"
@@ -910,7 +913,7 @@
 
                     <!-- Notes -->
                     <div class="space-y-2">
-                        <x-input-label for="new_notes" :value="__('Notes')" />
+                        <x-input-label for="new_notes" :value="__('Notes')" hint="Internal customer notes. Example: Prefers WhatsApp updates." />
                         <textarea
                             id="new_notes"
                             x-model="newCust.notes"

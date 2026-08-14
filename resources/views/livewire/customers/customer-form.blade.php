@@ -18,6 +18,7 @@
                 wire:model="name"
                 placeholder="Customer Name"
                 required
+                hint="Customer display name. Example: Asha Menon."
             />
 
             <!-- Contact Info -->
@@ -29,6 +30,7 @@
                         type="email"
                         wire:model="email"
                         placeholder="email@example.com"
+                        hint="Customer email address. Example: asha@example.com."
                     />
                 </div>
 
@@ -39,12 +41,13 @@
                         type="text"
                         wire:model="phone"
                         placeholder="+62..."
+                        hint="Customer phone number. Example: +91 98765 43210."
                     />
                 </div>
             </div>
 
             <div class="space-y-2">
-                <x-input-label for="address" :value="__('Address')" />
+                <x-input-label for="address" :value="__('Address')" hint="Customer billing or delivery address. Example: 12 MG Road, Bengaluru." />
                 <textarea
                     id="address"
                     wire:model="address"
@@ -56,7 +59,7 @@
             </div>
 
             <div class="space-y-2">
-                <x-input-label for="notes" :value="__('Notes')" />
+                <x-input-label for="notes" :value="__('Notes')" hint="Internal customer notes. Example: Prefers WhatsApp updates." />
                 <textarea
                     id="notes"
                     wire:model="notes"

@@ -229,7 +229,7 @@
                                     @method('DELETE')
 
                                     <div class="mb-4">
-                                        <x-input-label for="reason" :value="__('Reason')" />
+                                        <x-input-label for="reason" :value="__('Reason')" hint="Optional note explaining why this sale action is being taken. Example: Customer requested cancellation." />
                                         <textarea
                                             name="reason"
                                             id="reason"

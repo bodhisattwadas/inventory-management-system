@@ -19,11 +19,12 @@
                 wire:model="name"
                 placeholder="e.g. Laptops"
                 required
+                hint="Product category name. Example: Skin Care."
             />
 
             <!-- Description -->
             <div class="space-y-2">
-                <x-input-label for="description" :value="__('Description')" />
+                <x-input-label for="description" :value="__('Description')" hint="Optional category explanation. Example: Creams, serums, and cleansers." />
                 <textarea
                     id="description"
                     wire:model="description"
