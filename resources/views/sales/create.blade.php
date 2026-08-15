@@ -892,6 +892,7 @@
                                 name="new_phone"
                                 label="Phone"
                                 x-model="newCust.phone"
+                                placeholder="+91 98765 43210"
                                 hint="Customer phone number. Example: +91 98765 43210."
                             />
                             <p x-show="errors.phone" x-text="errors.phone" class="text-sm font-medium text-red-600 mt-1" style="display: none;"></p>

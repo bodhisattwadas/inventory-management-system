@@ -67,7 +67,7 @@
             <h1>{{ $storeName }}</h1>
             <p>{{ $storeAddress }}</p>
             @if($storePhone !== '-')
-                <p>Phone: {{ $storePhone }}</p>
+                <p>Phone: {{ format_indian_phone($storePhone) }}</p>
             @endif
             @if($storeEmail !== '-')
                 <p>Email: {{ $storeEmail }}</p>

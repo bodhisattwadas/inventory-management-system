@@ -51,7 +51,7 @@
                 <td>
                     <div class="store-name">{{ $storeName }}</div>
                     <p class="small-line">{{ $storeAddress }}</p>
-                    <p class="small-line">Phone: {{ $storePhone }}</p>
+                    <p class="small-line">Phone: {{ format_indian_phone($storePhone) }}</p>
                     <p class="small-line">Email: {{ $storeEmail }}</p>
                 </td>
                 <td class="right">
@@ -68,7 +68,7 @@
                 <div class="panel-title">Order From / Supplier</div>
                 <div class="value">{{ $purchase->supplier->name ?? '-' }}</div>
                 <p class="small-line">Contact: {{ $purchase->supplier->contact_person ?: '-' }}</p>
-                <p class="small-line">Phone: {{ $purchase->supplier->phone ?: '-' }}</p>
+                <p class="small-line">Phone: {{ format_indian_phone($purchase->supplier->phone) }}</p>
                 <p class="small-line">Email: {{ $purchase->supplier->email ?: '-' }}</p>
                 <p class="small-line">GST / Tax ID: {{ $purchase->supplier->tax_id ?: '-' }}</p>
                 <p class="small-line">Address: {{ $supplierAddress }}</p>

@@ -52,6 +52,7 @@ final class CustomerTable extends PowerGridComponent
             ->add('name')
             ->add('email')
             ->add('phone')
+            ->add('phone_formatted', fn(Customer $model) => format_indian_phone($model->phone))
             ->add('address')
             ->add('notes')
             ->add('created_at')
@@ -73,7 +74,7 @@ final class CustomerTable extends PowerGridComponent
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Phone', 'phone')
+            Column::make('Phone', 'phone_formatted', 'phone')
                 ->sortable()
                 ->searchable(),
 

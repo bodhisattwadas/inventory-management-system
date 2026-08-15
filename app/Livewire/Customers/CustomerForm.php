@@ -30,7 +30,7 @@ class CustomerForm extends Component
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255', 'unique:customers,email,' . ($this->customer?->id)],
-            'phone' => ['nullable', 'string', 'max:20'],
+            'phone' => ['nullable', 'string', 'max:20', 'regex:/^\s*(?:\+91|91|0)?[\s-]*[6-9]\d{4}[\s-]*\d{5}\s*$/'],
             'address' => ['nullable', 'string', 'max:1000'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];

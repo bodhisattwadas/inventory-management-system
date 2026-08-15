@@ -28,9 +28,9 @@ class CustomerController extends Controller
                 ->map(function ($customer) {
                     return [
                         'value' => $customer->id,
-                        'text' => $customer->name . ($customer->phone ? ' | ' . $customer->phone : ''),
+                        'text' => $customer->name . ($customer->phone ? ' | ' . format_indian_phone($customer->phone) : ''),
                         'name' => $customer->name,
-                        'phone' => $customer->phone,
+                        'phone' => $customer->phone ? format_indian_phone($customer->phone) : null,
                     ];
                 });
         });
@@ -43,7 +43,7 @@ class CustomerController extends Controller
         try {
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
-                'phone' => 'nullable|string|max:20',
+                'phone' => ['nullable', 'string', 'max:20', 'regex:/^\s*(?:\+91|91|0)?[\s-]*[6-9]\d{4}[\s-]*\d{5}\s*$/'],
                 'email' => 'nullable|email|max:255',
                 'address' => 'nullable|string|max:500',
                 'notes' => 'nullable|string|max:500',

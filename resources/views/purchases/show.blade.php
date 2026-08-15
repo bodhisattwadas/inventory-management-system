@@ -81,7 +81,7 @@
                         <p class="mt-1 text-sm text-gray-500">{{ __('Store details used on the purchase order PDF.') }}</p>
                         <div class="mt-4 space-y-2 text-sm text-slate-700">
                             <p><span class="font-medium text-gray-500">{{ __('Address') }}:</span> {{ $storeAddress }}</p>
-                            <p><span class="font-medium text-gray-500">{{ __('Phone') }}:</span> {{ $storePhone }}</p>
+                            <p><span class="font-medium text-gray-500">{{ __('Phone') }}:</span> {{ format_indian_phone($storePhone) }}</p>
                             <p><span class="font-medium text-gray-500">{{ __('Email') }}:</span> {{ $storeEmail }}</p>
                         </div>
                     </div>
@@ -94,7 +94,7 @@
                         <div class="mt-4 space-y-2 text-sm text-slate-700">
                             <p class="font-semibold text-gray-900">{{ $purchase->supplier->name ?? '-' }}</p>
                             <p><span class="font-medium text-gray-500">{{ __('Contact') }}:</span> {{ $purchase->supplier->contact_person ?: '-' }}</p>
-                            <p><span class="font-medium text-gray-500">{{ __('Phone') }}:</span> {{ $purchase->supplier->phone ?: '-' }}</p>
+                            <p><span class="font-medium text-gray-500">{{ __('Phone') }}:</span> {{ format_indian_phone($purchase->supplier->phone) }}</p>
                             <p><span class="font-medium text-gray-500">{{ __('Email') }}:</span> {{ $purchase->supplier->email ?: '-' }}</p>
                             <p><span class="font-medium text-gray-500">{{ __('GST / Tax ID') }}:</span> {{ $purchase->supplier->tax_id ?: '-' }}</p>
                             <p><span class="font-medium text-gray-500">{{ __('Address') }}:</span> {{ $supplierAddress }}</p>

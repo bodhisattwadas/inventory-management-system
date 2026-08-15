@@ -63,7 +63,7 @@
     <div class="section">
         <h2>Contact Information</h2>
         <table class="data">
-            <tr><td>{{ $vendor->primary_contact_person ?: '-' }}</td><td>{{ $vendor->primary_email ?: '-' }}</td><td>{{ $vendor->primary_phone ?: '-' }}</td><td>{{ $vendor->alternate_phone ?: '-' }}</td></tr>
+            <tr><td>{{ $vendor->primary_contact_person ?: '-' }}</td><td>{{ $vendor->primary_email ?: '-' }}</td><td>{{ format_indian_phone($vendor->primary_phone) }}</td><td>{{ format_indian_phone($vendor->alternate_phone) }}</td></tr>
             <tr><th>Primary contact</th><th>Primary email</th><th>Primary phone</th><th>Alternate phone</th></tr>
             <tr><td colspan="2">{{ $vendor->accounts_email ?: '-' }}</td><td colspan="2">{{ $vendor->po_email ?: '-' }}</td></tr>
             <tr><th colspan="2">Accounts email</th><th colspan="2">Purchase order email</th></tr>
@@ -100,7 +100,7 @@
         <h2>Contacts</h2>
         <table class="data"><thead><tr><th>Name</th><th>Role</th><th>Phone</th><th>Email</th><th>Flags</th></tr></thead><tbody>
         @forelse($vendor->contacts as $contact)
-            <tr><td>{{ trim($contact->first_name.' '.$contact->last_name) }}</td><td>{{ collect([$contact->designation, $contact->department])->filter()->join(' / ') ?: '-' }}</td><td>{{ $contact->mobile ?: ($contact->phone ?: '-') }}</td><td>{{ $contact->email ?: '-' }}</td><td>{{ $contact->is_primary ? 'Primary; ' : '' }}{{ $contact->receives_po ? 'Receives PO' : '' }}</td></tr>
+            <tr><td>{{ trim($contact->first_name.' '.$contact->last_name) }}</td><td>{{ collect([$contact->designation, $contact->department])->filter()->join(' / ') ?: '-' }}</td><td>{{ format_indian_phone($contact->mobile ?: $contact->phone) }}</td><td>{{ $contact->email ?: '-' }}</td><td>{{ $contact->is_primary ? 'Primary; ' : '' }}{{ $contact->receives_po ? 'Receives PO' : '' }}</td></tr>
         @empty <tr><td colspan="5" class="muted">No contacts recorded.</td></tr> @endforelse
         </tbody></table>
     </div>
@@ -109,7 +109,7 @@
         <h2>Addresses</h2>
         <table class="data"><thead><tr><th>Type</th><th>Address</th><th>Contact</th></tr></thead><tbody>
         @forelse($vendor->addresses as $address)
-            <tr><td>{{ Str::title($address->address_type ?: 'Address') }}{{ $address->is_default ? ' (Default)' : '' }}</td><td>{{ collect([$address->address_line_1,$address->address_line_2,$address->landmark,$address->city,$address->district,$address->state,$address->postal_code,$address->country])->filter()->join(', ') }}</td><td>{{ collect([$address->phone,$address->email])->filter()->join(' / ') ?: '-' }}</td></tr>
+            <tr><td>{{ Str::title($address->address_type ?: 'Address') }}{{ $address->is_default ? ' (Default)' : '' }}</td><td>{{ collect([$address->address_line_1,$address->address_line_2,$address->landmark,$address->city,$address->district,$address->state,$address->postal_code,$address->country])->filter()->join(', ') }}</td><td>{{ collect([format_indian_phone($address->phone), $address->email])->reject(fn ($value) => $value === '-')->join(' / ') ?: '-' }}</td></tr>
         @empty <tr><td colspan="3" class="muted">No addresses recorded.</td></tr> @endforelse
         </tbody></table>
     </div>

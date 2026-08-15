@@ -82,7 +82,7 @@
                     <div class="mt-4 grid grid-cols-1 gap-3 text-sm text-slate-700 md:grid-cols-2 lg:grid-cols-3">
                         <p class="font-semibold text-gray-900">{{ $purchase->supplier->name ?? '-' }}</p>
                         <p><span class="font-medium text-gray-500">{{ __('Contact') }}:</span> {{ $purchase->supplier->contact_person ?: '-' }}</p>
-                        <p><span class="font-medium text-gray-500">{{ __('Phone') }}:</span> {{ $purchase->supplier->phone ?: '-' }}</p>
+                        <p><span class="font-medium text-gray-500">{{ __('Phone') }}:</span> {{ format_indian_phone($purchase->supplier->phone) }}</p>
                         <p><span class="font-medium text-gray-500">{{ __('Email') }}:</span> {{ $purchase->supplier->email ?: '-' }}</p>
                         <p><span class="font-medium text-gray-500">{{ __('GST / Tax ID') }}:</span> {{ $purchase->supplier->tax_id ?: '-' }}</p>
                         <p class="md:col-span-2 lg:col-span-3"><span class="font-medium text-gray-500">{{ __('Address') }}:</span> {{ $supplierAddress }}</p>

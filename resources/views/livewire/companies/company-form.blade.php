@@ -24,6 +24,12 @@
                     <x-text-input id="short_name" name="short_name" wire:model="short_name" class="block w-full" />
                     <x-input-error :messages="$errors->get('short_name')" />
                 </div>
+
+                <div class="space-y-2">
+                    <x-input-label for="phone" :value="__('Phone')" hint="Indian contact number. Example: +91 98765 43210." />
+                    <x-text-input id="phone" name="phone" wire:model="phone" class="block w-full" placeholder="+91 98765 43210" />
+                    <x-input-error :messages="$errors->get('phone')" />
+                </div>
             </div>
 
             <div class="mt-6 flex justify-end gap-3 border-t border-gray-200 pt-4">

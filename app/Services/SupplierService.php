@@ -114,6 +114,8 @@ class SupplierService
             'swift_bic' => $data->swift_bic,
             'beneficiary_name' => $data->beneficiary_name,
             'bank_country' => $data->bank_country,
+            'blank_cheque_path' => $data->blank_cheque_path,
+            'gst_document_path' => $data->gst_document_path,
             'status' => $data->status,
             'notes' => $data->notes,
         ];

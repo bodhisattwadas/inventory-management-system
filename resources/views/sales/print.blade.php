@@ -248,7 +248,7 @@
                     <div class="company-desc">Selling: cosmetics, beauty tools, skincare, and accessories.</div>
                     <div class="company-address">
                         {{ \App\Models\Setting::get('store_address', 'Jl. Default No. 1') }}<br>
-                        Phone: {{ \App\Models\Setting::get('store_phone', '-') }}
+                        Phone: {{ format_indian_phone(\App\Models\Setting::get('store_phone', '-')) }}
                         @if(\App\Models\Setting::get('store_email'))
                             <br>Email: {{ \App\Models\Setting::get('store_email') }}
                         @endif

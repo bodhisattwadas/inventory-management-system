@@ -46,6 +46,8 @@ class Supplier extends Model
         'swift_bic',
         'beneficiary_name',
         'bank_country',
+        'blank_cheque_path',
+        'gst_document_path',
         'status',
         'notes',
     ];

@@ -14,7 +14,7 @@ class SettingSeeder extends Seeder
     {
         Setting::set('store_name', 'Glam & Glow');
         Setting::set('store_address', 'BK Moitra Rd, Baranagar, West Bengal 700036');
-        Setting::set('store_phone', '07003850742');
+        Setting::set('store_phone', '+91 70038 50742');
         Setting::set('store_email', 'contact@cgagroup.co.in');
         Setting::set('opening_balance_date', now()->startOfYear()->toDateString());
         Setting::set('opening_balance_amount', '10000000');

@@ -27,7 +27,7 @@
                     </div>
                     <div class="space-y-1">
                         <label class="text-sm font-medium leading-none text-muted-foreground">{{ __('Phone') }}</label>
-                        <p class="text-sm text-foreground font-medium">{{ $customer->phone ?? '-' }}</p>
+                        <p class="text-sm text-foreground font-medium">{{ format_indian_phone($customer->phone) }}</p>
                     </div>
                 </div>
 

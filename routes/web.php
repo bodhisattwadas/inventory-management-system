@@ -19,6 +19,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::view('profile', 'profile.index')->name('profile.index');
     Route::view('companies', 'companies.index')->name('companies.index');
+    Route::get('companies/{company}', [CompanyController::class, 'show'])->name('companies.show');
     Route::delete('companies/{company}', [CompanyController::class, 'destroy'])->name('companies.destroy');
     Route::get('vendors/{vendor}/profile.pdf', [VendorProfileController::class, 'download'])->name('vendors.profile.pdf');
     Route::get('suppliers/{supplier}/profile.pdf', [SupplierProfileController::class, 'download'])->name('suppliers.profile.pdf');
@@ -29,6 +30,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('master')->group(function () {
         Route::view('customers', 'customers.index')->name('customers.index');
         Route::view('suppliers/create', 'suppliers.create')->name('suppliers.create');
+        Route::get('suppliers/{supplier}', function (\App\Models\Supplier $supplier) {
+            $supplier->load('companies');
+
+            return view('suppliers.show', compact('supplier'));
+        })->name('suppliers.show');
         Route::get('suppliers/{supplier}/edit', function (\App\Models\Supplier $supplier) {
             return view('suppliers.edit', compact('supplier'));
         })->name('suppliers.edit');

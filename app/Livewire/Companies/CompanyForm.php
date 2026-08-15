@@ -14,6 +14,7 @@ class CompanyForm extends Component
     public string $company_code = '';
     public string $company_name = '';
     public string $short_name = '';
+    public string $phone = '';
     public string $status = 'active';
 
     protected function rules(): array
@@ -22,6 +23,7 @@ class CompanyForm extends Component
             'company_code' => ['required', 'string', 'max:50', 'unique:companies,company_code,' . ($this->company?->id)],
             'company_name' => ['required', 'string', 'max:255'],
             'short_name' => ['required', 'string', 'max:100'],
+            'phone' => ['nullable', 'string', 'max:20', 'regex:/^\s*(?:\+91|91|0)?[\s-]*[6-9]\d{4}[\s-]*\d{5}\s*$/'],
             'status' => ['required', 'in:active,inactive'],
         ];
     }
@@ -54,6 +56,7 @@ class CompanyForm extends Component
     {
         $validated = $this->validate();
         $validated['company_type'] = 'Brand';
+        $validated['phone'] = normalize_indian_phone($validated['phone'] ?? null);
         $validated['status'] = 'active';
 
         $this->isEditing && $this->company

@@ -17,7 +17,7 @@ class CustomerData
         return new self(
             name: $data['name'],
             email: empty($data['email']) ? null : $data['email'],
-            phone: empty($data['phone']) ? null : $data['phone'],
+            phone: normalize_indian_phone($data['phone'] ?? null),
             address: empty($data['address']) ? null : $data['address'],
             notes: empty($data['notes']) ? null : $data['notes'],
         );

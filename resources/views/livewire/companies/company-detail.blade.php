@@ -33,6 +33,10 @@
                     <p class="text-sm font-medium">{{ $company->vendors_count ?? 0 }}</p>
                 </div>
                 <div>
+                    <x-input-label value="{{ __('Phone') }}" hint="Indian contact number. Example: +91 98765 43210." class="text-muted-foreground" />
+                    <p class="text-sm font-medium">{{ format_indian_phone($company->phone) }}</p>
+                </div>
+                <div>
                     <x-input-label value="{{ __('Created') }}" hint="Date this brand/company record was added. Example: 14 Aug 2026." class="text-muted-foreground" />
                     <p class="text-sm font-medium">{{ $company->created_at?->format('d M Y, H:i') ?: '-' }}</p>
                 </div>

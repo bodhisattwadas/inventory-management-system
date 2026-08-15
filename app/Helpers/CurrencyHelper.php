@@ -32,3 +32,60 @@ if (!function_exists('format_money')) {
         return "{$symbol} {$formattedAmount}";
     }
 }
+
+if (!function_exists('format_indian_phone')) {
+    function format_indian_phone(?string $phone): string
+    {
+        if (blank($phone)) {
+            return '-';
+        }
+
+        $value = trim($phone);
+        $digits = preg_replace('/\D+/', '', $value);
+
+        if (strlen($digits) === 11 && str_starts_with($digits, '0')) {
+            $digits = substr($digits, 1);
+        }
+
+        if (strlen($digits) === 12 && str_starts_with($digits, '91')) {
+            $digits = substr($digits, 2);
+        }
+
+        if (strlen($digits) === 10) {
+            return '+91 '.substr($digits, 0, 5).' '.substr($digits, 5);
+        }
+
+        return $value;
+    }
+}
+
+if (!function_exists('normalize_indian_phone')) {
+    function normalize_indian_phone(?string $phone): ?string
+    {
+        if (blank($phone)) {
+            return null;
+        }
+
+        $formatted = format_indian_phone($phone);
+
+        return $formatted === '-' ? null : $formatted;
+    }
+}
+
+if (!function_exists('public_storage_url')) {
+    function public_storage_url(?string $path): ?string
+    {
+        if (blank($path)) {
+            return null;
+        }
+
+        $path = ltrim($path, '/');
+        $path = str_starts_with($path, 'storage/') ? substr($path, 8) : $path;
+
+        if (app()->environment('local') && file_exists(public_path('storage/'.$path))) {
+            return url('public/storage/'.$path);
+        }
+
+        return asset('storage/'.$path);
+    }
+}

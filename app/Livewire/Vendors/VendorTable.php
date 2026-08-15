@@ -48,6 +48,7 @@ final class VendorTable extends PowerGridComponent
             ->add('companies_badges', fn (Vendor $vendor) => $vendor->companies->pluck('company_name')->take(3)->join(', '))
             ->add('primary_contact_person')
             ->add('primary_phone')
+            ->add('primary_phone_formatted', fn($model) => format_indian_phone($model->primary_phone))
             ->add('primary_email')
             ->add('tax_id', fn (Vendor $vendor) => $vendor->taxDetails->first()?->gstin ?? $vendor->taxDetails->first()?->tax_registration_number)
             ->add('status');
@@ -61,7 +62,7 @@ final class VendorTable extends PowerGridComponent
             Column::make('Legal Name', 'legal_name')->sortable()->searchable(),
             Column::make('Companies Covered', 'companies_badges'),
             Column::make('Primary Contact', 'primary_contact_person')->searchable(),
-            Column::make('Phone', 'primary_phone')->searchable(),
+            Column::make('Phone', 'primary_phone_formatted', 'primary_phone')->searchable(),
             Column::make('Email', 'primary_email')->searchable(),
             Column::make('GST / Tax ID', 'tax_id'),
             Column::make('Status', 'status')->sortable()->searchable(),

@@ -59,7 +59,9 @@ final class PurchaseTable extends PowerGridComponent
             ->add('id')
             ->add('invoice_number', fn(Purchase $model) => $model->invoice_number ?: '<span class="italic text-gray-400">-</span>')
             ->add('supplier_name', fn(Purchase $model) => $model->supplier ? $model->supplier->name : '-')
+            ->add('supplier_link', fn(Purchase $model) => $this->supplierLink($model))
             ->add('company_name', fn(Purchase $model) => $model->company ? ($model->company->short_name ?: $model->company->company_name) : '-')
+            ->add('company_link', fn(Purchase $model) => $this->companyLink($model))
             ->add('purchase_date_formatted', fn(Purchase $model) => Carbon::parse($model->purchase_date)->format('d/m/Y'))
             ->add('total_formatted', fn(Purchase $model) => format_money((float) $model->total))
             ->add('status_badge', function(Purchase $model) {
@@ -81,11 +83,11 @@ final class PurchaseTable extends PowerGridComponent
                 ->searchable()
                 ->sortable(),
 
-            Column::make('Supplier / Vendor', 'supplier_name', 'supplier_id')
+            Column::make('Supplier / Vendor', 'supplier_link', 'supplier_id')
                 ->searchable()
                 ->sortable(),
 
-            Column::make('Brand / Company', 'company_name', 'company_id')
+            Column::make('Brand / Company', 'company_link', 'company_id')
                 ->searchable()
                 ->sortable(),
 
@@ -108,6 +110,55 @@ final class PurchaseTable extends PowerGridComponent
             Column::make('Created By', 'creator_name', 'created_by')
                 ->sortable(),
         ];
+    }
+
+    private function supplierLink(Purchase $purchase): string
+    {
+        $supplier = $purchase->supplier;
+
+        if (! $supplier) {
+            return '-';
+        }
+
+        $details = collect([
+            $supplier->name,
+            $supplier->contact_person ? 'Contact: '.$supplier->contact_person : null,
+            $supplier->phone ? 'Phone: '.format_indian_phone($supplier->phone) : null,
+            $supplier->email ? 'Email: '.$supplier->email : null,
+            $supplier->tax_id ? 'GST / Tax ID: '.$supplier->tax_id : null,
+        ])->filter()->join("\n");
+
+        return sprintf(
+            '<a href="%s" title="%s" class="font-medium text-blue-700 underline-offset-2 hover:text-blue-900 hover:underline">%s</a>',
+            e(route('suppliers.show', $supplier)),
+            e($details),
+            e($supplier->name)
+        );
+    }
+
+    private function companyLink(Purchase $purchase): string
+    {
+        $company = $purchase->company;
+
+        if (! $company) {
+            return '-';
+        }
+
+        $name = $company->short_name ?: $company->company_name;
+        $details = collect([
+            $company->company_name,
+            $company->company_code ? 'Code: '.$company->company_code : null,
+            $company->company_type ? 'Type: '.$company->company_type : null,
+            $company->gstin ? 'GSTIN: '.$company->gstin : null,
+            $company->phone ? 'Phone: '.format_indian_phone($company->phone) : null,
+        ])->filter()->join("\n");
+
+        return sprintf(
+            '<a href="%s" title="%s" class="font-medium text-blue-700 underline-offset-2 hover:text-blue-900 hover:underline">%s</a>',
+            e(route('companies.show', $company)),
+            e($details),
+            e($name)
+        );
     }
 
     public function filters(): array

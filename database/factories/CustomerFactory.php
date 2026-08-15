@@ -19,7 +19,7 @@ class CustomerFactory extends Factory
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
-            'phone' => fake()->phoneNumber(),
+            'phone' => '+91 '.fake()->numberBetween(60000, 99999).' '.fake()->numberBetween(10000, 99999),
             'address' => fake()->address(),
             'notes' => fake()->optional(0.3)->sentence(), // 30% chance of having notes
         ];

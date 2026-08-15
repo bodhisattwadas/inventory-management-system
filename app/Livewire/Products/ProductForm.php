@@ -111,6 +111,11 @@ class ProductForm extends Component
         ];
     }
 
+    public function updatedImage(): void
+    {
+        $this->validateOnly('image');
+    }
+
     public function save(ProductService $service): void
     {
         $validated = $this->validate();
@@ -124,10 +129,12 @@ class ProductForm extends Component
 
         try {
             if ($this->isEditing && $this->product) {
-                $service->updateProduct($this->product, $data);
+                $this->product = $service->updateProduct($this->product, $data);
+                $this->currentImagePath = $this->product->image_path;
                 $message = 'Product updated successfully.';
             } else {
-                $service->createProduct($data);
+                $this->product = $service->createProduct($data);
+                $this->currentImagePath = $this->product->image_path;
                 $message = 'Product created successfully.';
             }
 

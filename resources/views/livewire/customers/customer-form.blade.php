@@ -40,7 +40,7 @@
                         label="Phone"
                         type="text"
                         wire:model="phone"
-                        placeholder="+62..."
+                        placeholder="+91 98765 43210"
                         hint="Customer phone number. Example: +91 98765 43210."
                     />
                 </div>

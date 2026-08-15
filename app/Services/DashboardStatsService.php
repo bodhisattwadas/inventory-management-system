@@ -222,7 +222,7 @@ class DashboardStatsService
                 ->map(function ($item) {
                      return [
                          'customer_name' => $item->customer->name ?? 'Unknown',
-                         'phone' => $item->customer->phone ?? '-',
+                         'phone' => format_indian_phone($item->customer->phone),
                          'total_spent' => $item->total_spent
                      ];
                 })

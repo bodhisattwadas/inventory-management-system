@@ -36,8 +36,8 @@
                     <x-form-input name="primary_email" label="Primary Email" type="email" wire:model="primary_email" hint="Main vendor communication email. Example: orders@supplier.com." />
                     <x-form-input name="accounts_email" label="Accounts Email" type="email" wire:model="accounts_email" hint="Email used for invoices and payment queries. Example: accounts@supplier.com." />
                     <x-form-input name="po_email" label="Purchase Email" type="email" wire:model="po_email" hint="Email used for purchase orders. Example: po@supplier.com." />
-                    <x-form-input name="primary_phone" label="Primary Phone" wire:model="primary_phone" hint="Main vendor phone number. Example: +91 98765 43210." />
-                    <x-form-input name="alternate_phone" label="Alternate Phone" wire:model="alternate_phone" hint="Backup phone number for vendor contact. Example: +91 91234 56789." />
+                    <x-form-input name="primary_phone" label="Primary Phone" wire:model="primary_phone" placeholder="+91 98765 43210" hint="Main vendor Indian phone number. Example: +91 98765 43210." />
+                    <x-form-input name="alternate_phone" label="Alternate Phone" wire:model="alternate_phone" placeholder="+91 91234 56789" hint="Backup Indian phone number for vendor contact. Example: +91 91234 56789." />
                 </div>
             </div>
 

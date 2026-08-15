@@ -52,7 +52,7 @@
                     </div>
                     <div>
                         <x-input-label value="{{ __('Phone') }}" hint="Main supplier phone number. Example: +91 98765 43210." class="text-muted-foreground" />
-                        <p class="text-sm font-medium">{{ $supplier->phone ?: '-' }}</p>
+                        <p class="text-sm font-medium">{{ format_indian_phone($supplier->phone) }}</p>
                     </div>
                     <div>
                         <x-input-label value="{{ __('GST / Tax ID') }}" hint="Tax identifier used for compliant billing. Example: 29ABCDE1234F1Z5." class="text-muted-foreground" />
@@ -93,6 +93,27 @@
                 <section>
                     <x-input-label value="{{ __('Notes') }}" hint="Internal remarks not printed on normal documents. Example: Payment due in 30 days." class="mb-2 block" />
                     <p class="text-sm font-medium whitespace-pre-line">{{ $supplier->notes ?: '-' }}</p>
+                </section>
+
+                <section>
+                    <x-input-label value="{{ __('Documents') }}" hint="Supplier verification documents. Example: blank cheque and GST certificate." class="mb-2 block" />
+                    <div class="flex flex-wrap gap-2">
+                        @if($supplier->blank_cheque_path)
+                            <a href="{{ public_storage_url($supplier->blank_cheque_path) }}" target="_blank" class="inline-flex items-center gap-1 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100">
+                                <x-heroicon-o-paper-clip class="h-4 w-4" />
+                                {{ __('Blank Cheque') }}
+                            </a>
+                        @endif
+                        @if($supplier->gst_document_path)
+                            <a href="{{ public_storage_url($supplier->gst_document_path) }}" target="_blank" class="inline-flex items-center gap-1 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-100">
+                                <x-heroicon-o-paper-clip class="h-4 w-4" />
+                                {{ __('GST Document') }}
+                            </a>
+                        @endif
+                        @unless($supplier->blank_cheque_path || $supplier->gst_document_path)
+                            <span class="text-sm text-gray-500">{{ __('No documents uploaded.') }}</span>
+                        @endunless
+                    </div>
                 </section>
             </div>
 

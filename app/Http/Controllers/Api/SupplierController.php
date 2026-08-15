@@ -25,7 +25,7 @@ class SupplierController extends Controller
                 ->map(function ($supplier) {
                     return [
                         'value' => $supplier->id,
-                        'text' => $supplier->name . ($supplier->phone ? ' | ' . $supplier->phone : ''),
+                        'text' => $supplier->name . ($supplier->phone ? ' | ' . format_indian_phone($supplier->phone) : ''),
                     ];
                 });
         });

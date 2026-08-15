@@ -52,6 +52,7 @@ final class SupplierTable extends PowerGridComponent
             ->add('contact_person')
             ->add('email')
             ->add('phone')
+            ->add('phone_formatted', fn(Supplier $supplier) => format_indian_phone($supplier->phone))
             ->add('companies_list', function (Supplier $supplier) {
                 $companies = $supplier->companies->pluck('company_name')->filter();
                 $count = $companies->count();
@@ -90,7 +91,7 @@ final class SupplierTable extends PowerGridComponent
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Phone', 'phone')
+            Column::make('Phone', 'phone_formatted', 'phone')
                 ->sortable()
                 ->searchable(),
 

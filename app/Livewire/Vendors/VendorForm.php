@@ -63,8 +63,8 @@ class VendorForm extends Component
             'vendor_category_id' => ['nullable', 'exists:vendor_categories,id'],
             'primary_contact_person' => ['nullable', 'string', 'max:255'],
             'primary_email' => ['nullable', 'email', 'max:255'],
-            'primary_phone' => ['nullable', 'string', 'max:50'],
-            'alternate_phone' => ['nullable', 'string', 'max:50'],
+            'primary_phone' => ['nullable', 'string', 'max:20', 'regex:/^\s*(?:\+91|91|0)?[\s-]*[6-9]\d{4}[\s-]*\d{5}\s*$/'],
+            'alternate_phone' => ['nullable', 'string', 'max:20', 'regex:/^\s*(?:\+91|91|0)?[\s-]*[6-9]\d{4}[\s-]*\d{5}\s*$/'],
             'accounts_email' => ['nullable', 'email', 'max:255'],
             'po_email' => ['nullable', 'email', 'max:255'],
             'registration_number' => ['nullable', 'string', 'max:100'],
@@ -136,6 +136,8 @@ class VendorForm extends Component
     public function save(VendorService $service): void
     {
         $validated = $this->validate();
+        $validated['primary_phone'] = normalize_indian_phone($validated['primary_phone'] ?? null);
+        $validated['alternate_phone'] = normalize_indian_phone($validated['alternate_phone'] ?? null);
         $companyIds = $validated['company_ids'] ?? [];
         $bankData = collect($validated)->only([
             'bank_name',

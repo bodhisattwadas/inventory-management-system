@@ -21,9 +21,9 @@
             </div>
 
             <div class="space-y-6">
-                @if($product->image_path)
+                @if($product->image_url)
                     <div class="overflow-hidden rounded-md border border-gray-200 bg-gray-50">
-                        <img src="{{ Storage::url($product->image_path) }}" alt="{{ $product->name }}" class="max-h-64 w-full object-contain">
+                        <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="max-h-64 w-full object-contain">
                     </div>
                 @endif
 

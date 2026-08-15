@@ -9,7 +9,7 @@
     </div>
 @endunless
 
-<form wire:submit="save" class="{{ $formClass }}">
+<form wire:submit="save" enctype="multipart/form-data" class="{{ $formClass }}">
     <section class="{{ $asPage ? 'pt-4 ' : '' }}pb-6">
         <div class="mb-4">
             <x-input-label value="{{ __('Supplier Details') }}" hint="Basic identity and tax information for this supplier. Example: GST ID and active status." />
@@ -43,8 +43,8 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <x-form-input name="contact_person" label="Contact Person" wire:model="contact_person" hint="Person to contact for orders or payments. Example: Jody Watsica." />
             <x-form-input name="email" label="Email" type="email" wire:model="email" hint="Primary email for supplier communication. Example: orders@supplier.com." />
-            <x-form-input name="phone" label="Phone 1" wire:model="phone" required hint="Main supplier phone number. Example: +91 98765 43210." />
-            <x-form-input name="alternate_phone" label="Phone 2" wire:model="alternate_phone" hint="Alternate phone number for backup contact. Example: +91 91234 56789." />
+            <x-form-input name="phone" label="Phone 1" wire:model="phone" required placeholder="+91 98765 43210" hint="Main supplier Indian phone number. Example: +91 98765 43210." />
+            <x-form-input name="alternate_phone" label="Phone 2" wire:model="alternate_phone" placeholder="+91 91234 56789" hint="Alternate Indian phone number for backup contact. Example: +91 91234 56789." />
         </div>
     </section>
 
@@ -97,6 +97,58 @@
             <x-form-input name="beneficiary_name" label="Beneficiary Name" wire:model="beneficiary_name" hint="Name registered on the bank account. Example: Beauty World Pvt Ltd." />
         </div>
         <p class="mt-2 text-xs text-gray-500">{{ __('Saved account numbers are encrypted and only the last four digits are kept searchable.') }}</p>
+    </section>
+
+    <section class="border-t border-gray-200 py-6">
+        <div class="mb-4">
+            <x-input-label value="{{ __('Supplier Documents') }}" hint="Upload supplier verification documents. Example: blank cheque image and GST certificate PDF." />
+            <p class="text-xs text-muted-foreground">{{ __('Accepted formats: PDF, JPG, PNG, or WEBP up to 10 MB each.') }}</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="space-y-2 rounded-md border border-gray-200 p-4">
+                <x-input-label for="blank_cheque" :value="__('Blank Cheque')" hint="Cancelled or blank cheque used to verify supplier bank account details. Example: blank-cheque.jpg." />
+                <input
+                    id="blank_cheque"
+                    type="file"
+                    wire:model="blank_cheque"
+                    accept="application/pdf,image/jpeg,image/png,image/webp"
+                    class="block w-full text-sm text-gray-700 file:mr-4 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-foreground hover:file:bg-primary/90"
+                >
+                <div wire:loading wire:target="blank_cheque" class="text-xs text-muted-foreground">{{ __('Uploading blank cheque...') }}</div>
+                @if($blank_cheque)
+                    <p class="text-xs font-medium text-emerald-700">{{ __('Selected') }}: {{ $blank_cheque->getClientOriginalName() }}</p>
+                @endif
+                @if($current_blank_cheque_path)
+                    <a href="{{ public_storage_url($current_blank_cheque_path) }}" target="_blank" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline">
+                        <x-heroicon-o-paper-clip class="h-4 w-4" />
+                        {{ __('View current blank cheque') }}
+                    </a>
+                @endif
+                <x-input-error :messages="$errors->get('blank_cheque')" />
+            </div>
+
+            <div class="space-y-2 rounded-md border border-gray-200 p-4">
+                <x-input-label for="gst_document" :value="__('GST Document')" hint="Supplier GST certificate or tax registration document. Example: gst-certificate.pdf." />
+                <input
+                    id="gst_document"
+                    type="file"
+                    wire:model="gst_document"
+                    accept="application/pdf,image/jpeg,image/png,image/webp"
+                    class="block w-full text-sm text-gray-700 file:mr-4 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-foreground hover:file:bg-primary/90"
+                >
+                <div wire:loading wire:target="gst_document" class="text-xs text-muted-foreground">{{ __('Uploading GST document...') }}</div>
+                @if($gst_document)
+                    <p class="text-xs font-medium text-emerald-700">{{ __('Selected') }}: {{ $gst_document->getClientOriginalName() }}</p>
+                @endif
+                @if($current_gst_document_path)
+                    <a href="{{ public_storage_url($current_gst_document_path) }}" target="_blank" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline">
+                        <x-heroicon-o-paper-clip class="h-4 w-4" />
+                        {{ __('View current GST document') }}
+                    </a>
+                @endif
+                <x-input-error :messages="$errors->get('gst_document')" />
+            </div>
+        </div>
     </section>
 
     <section class="border-t border-gray-200 py-6">
