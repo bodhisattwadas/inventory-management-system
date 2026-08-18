@@ -57,7 +57,7 @@
                                     Vendor Invoices
                                 </x-dropdown-link>
                                 <x-dropdown-link :href="route('suppliers.index')" :active="request()->routeIs('suppliers.*')">
-                                    Suppliers
+                                    Vendors / Suppliers
                                 </x-dropdown-link>
                             </x-slot>
                         </x-nav-dropdown>
@@ -239,7 +239,7 @@
                                 <div class="mt-2 flex flex-col gap-2 pl-4 border-l border-border ml-2">
                                     <a class="text-sm font-medium hover:underline py-1 {{ request()->routeIs('purchases.*') ? 'text-primary' : '' }}" href="{{ route('purchases.index') }}">Purchase Orders</a>
                                     <a class="text-sm font-medium hover:underline py-1 {{ request()->routeIs('vendor-invoices.*') ? 'text-primary' : '' }}" href="{{ route('vendor-invoices.index') }}">Vendor Invoices</a>
-                                    <a class="text-sm font-medium hover:underline py-1 {{ request()->routeIs('suppliers.*') ? 'text-primary' : '' }}" href="{{ route('suppliers.index') }}">Suppliers</a>
+                                    <a class="text-sm font-medium hover:underline py-1 {{ request()->routeIs('suppliers.*') ? 'text-primary' : '' }}" href="{{ route('suppliers.index') }}">Vendors / Suppliers</a>
                                 </div>
                             </div>
                         </div>
