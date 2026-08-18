@@ -16,16 +16,28 @@
                 <x-input-label for="image" value="Product Image" hint="Image shown in product lists and detail views. Example: front-pack.jpg." />
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
                     <div class="space-y-2">
-                        <div class="h-28 w-28 overflow-hidden rounded-md border border-gray-200 bg-gray-50 shadow-sm">
+                        <div class="h-24 w-24 shrink-0 overflow-hidden rounded-md border border-gray-200 bg-gray-50 shadow-sm" style="width: 96px; height: 96px;">
                             <div wire:loading wire:target="image" class="flex h-full w-full items-center justify-center text-xs text-gray-400">
                                 Loading...
                             </div>
 
                             <div wire:loading.remove wire:target="image" class="h-full w-full">
                                 @if($image)
-                                    <img wire:key="new-product-image-{{ $image->getFilename() }}" src="{{ $image->temporaryUrl() }}" alt="New product image preview" class="h-full w-full object-cover">
+                                    <img
+                                        wire:key="new-product-image-{{ $image->getFilename() }}"
+                                        src="{{ $image->temporaryUrl() }}"
+                                        alt="New product image preview"
+                                        class="block h-24 w-24 object-contain"
+                                        style="width: 96px; height: 96px; max-width: 96px; max-height: 96px;"
+                                    >
                                 @elseif($product?->image_url)
-                                    <img wire:key="current-product-image-{{ $currentImagePath }}" src="{{ $product->image_url }}" alt="Current product image" class="h-full w-full object-cover">
+                                    <img
+                                        wire:key="current-product-image-{{ $currentImagePath }}"
+                                        src="{{ $product->image_url }}"
+                                        alt="Current product image"
+                                        class="block h-24 w-24 object-contain"
+                                        style="width: 96px; height: 96px; max-width: 96px; max-height: 96px;"
+                                    >
                                 @else
                                     <div class="flex h-full w-full items-center justify-center text-xs text-gray-400">
                                         No image

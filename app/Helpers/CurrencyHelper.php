@@ -82,10 +82,6 @@ if (!function_exists('public_storage_url')) {
         $path = ltrim($path, '/');
         $path = str_starts_with($path, 'storage/') ? substr($path, 8) : $path;
 
-        if (app()->environment('local') && file_exists(public_path('storage/'.$path))) {
-            return url('public/storage/'.$path);
-        }
-
         return asset('storage/'.$path);
     }
 }

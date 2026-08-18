@@ -46,10 +46,6 @@ class Product extends Model
         $path = ltrim($this->image_path, '/');
         $path = str_starts_with($path, 'storage/') ? substr($path, 8) : $path;
 
-        if (app()->environment('local') && file_exists(public_path('storage/'.$path))) {
-            return '/public/storage/'.$path;
-        }
-
         return asset('storage/'.$path);
     }
 
