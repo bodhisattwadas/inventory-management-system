@@ -7,6 +7,7 @@ use App\DTOs\PurchaseData;
 use Illuminate\Http\Request;
 use App\Enums\PurchaseStatus;
 use App\Services\PurchaseService;
+use App\Services\VendorInvoiceService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -171,7 +172,7 @@ class PurchaseController extends Controller
         }
     }
 
-    public function markReceived(Request $request, Purchase $purchase)
+    public function markReceived(Request $request, Purchase $purchase, VendorInvoiceService $vendorInvoiceService)
     {
         $purchase->load('items');
 
@@ -185,12 +186,15 @@ class PurchaseController extends Controller
             $rules['invoice_number'] = 'required|string|max:255';
         }
 
+        $rules['vendor_invoice_number'] = ['nullable', 'string', 'max:255'];
         $rules['proof_image'] = ['nullable', 'image', 'max:2048'];
+        $rules['vendor_invoice_file'] = ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:10240'];
 
         $validated = $request->validate($rules);
 
         try {
             $updateData = [];
+            $vendorInvoicePath = null;
 
             if ($request->filled('invoice_number')) {
                 $updateData['invoice_number'] = $request->invoice_number;
@@ -198,6 +202,10 @@ class PurchaseController extends Controller
 
             if ($request->hasFile('proof_image')) {
                 $updateData['proof_image'] = $request->file('proof_image')->store('proofs', 'public');
+            }
+
+            if ($request->hasFile('vendor_invoice_file')) {
+                $vendorInvoicePath = $request->file('vendor_invoice_file')->store('vendor-invoices', 'public');
             }
 
             if (!empty($updateData)) {
@@ -209,9 +217,15 @@ class PurchaseController extends Controller
                 ->all();
 
             $this->service->markAsReceived($purchase, $receivedQuantities);
+            $purchase->refresh()->load('items');
+            $vendorInvoiceService->createFromPurchase(
+                $purchase,
+                $request->filled('vendor_invoice_number') ? $request->vendor_invoice_number : null,
+                $vendorInvoicePath
+            );
 
             return redirect()->route('purchases.show', $purchase)
-                ->with('success', 'Purchase received and stock updated.');
+                ->with('success', 'Purchase received, inventory updated, and vendor invoice created.');
 
         } catch (PurchaseException $e) {
             return back()->withInput()->with('error', $e->getMessage());

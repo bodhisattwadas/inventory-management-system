@@ -8,6 +8,7 @@ use App\Http\Controllers\FinanceReportController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\VendorProfileController;
 use App\Http\Controllers\SupplierProfileController;
+use App\Http\Controllers\VendorInvoiceController;
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // =========================================================================
@@ -19,6 +20,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::view('profile', 'profile.index')->name('profile.index');
     Route::view('companies', 'companies.index')->name('companies.index');
+    Route::view('inventory', 'inventory.index')->name('inventory.index');
     Route::get('companies/{company}', [CompanyController::class, 'show'])->name('companies.show');
     Route::delete('companies/{company}', [CompanyController::class, 'destroy'])->name('companies.destroy');
     Route::get('vendors/{vendor}/profile.pdf', [VendorProfileController::class, 'download'])->name('vendors.profile.pdf');
@@ -77,6 +79,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::view('transactions', 'finance-transactions.index')->name('transactions.index');
         Route::get('transactions/print/{printId}', [FinanceReportController::class, 'print'])->name('transactions.print');
     });
+
+    Route::get('vendor-invoices', [VendorInvoiceController::class, 'index'])->name('vendor-invoices.index');
+    Route::get('vendor-invoices/{vendorInvoice}', [VendorInvoiceController::class, 'show'])->name('vendor-invoices.show');
+    Route::patch('vendor-invoices/{vendorInvoice}/paid', [VendorInvoiceController::class, 'markPaid'])->name('vendor-invoices.mark-paid');
 
     // =========================================================================
     // Settings & Users

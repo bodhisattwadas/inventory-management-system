@@ -15,7 +15,8 @@ use App\Exceptions\PurchaseException;
 class PurchaseService
 {
     public function __construct(
-        protected FinanceTransactionService $financeService
+        protected FinanceTransactionService $financeService,
+        protected InventoryService $inventoryService
     ) {
     }
 
@@ -144,6 +145,7 @@ class PurchaseService
 
                 if ($product) {
                     $product->increment('quantity', $receivedQuantity);
+                    $this->inventoryService->receivePurchaseItem($purchase, $item, $receivedQuantity);
 
                     // Update latest purchase price and selling price
                     $updateData = ['purchase_price' => $item->unit_price];

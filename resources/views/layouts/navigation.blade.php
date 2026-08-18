@@ -60,7 +60,7 @@
                         </x-nav-dropdown>
 
                         <!-- Finance Dropdown -->
-                        <x-nav-dropdown active="{{ request()->routeIs(['finance.*']) }}">
+                        <x-nav-dropdown active="{{ request()->routeIs(['finance.*', 'vendor-invoices.*']) }}">
                             <x-slot name="icon">
                                 <x-heroicon-o-currency-dollar class="mr-2 h-4 w-4" />
                             </x-slot>
@@ -70,6 +70,9 @@
                             <x-slot name="content">
                                 <x-dropdown-link :href="route('finance.transactions.index')" disabled>
                                     Transactions
+                                </x-dropdown-link>
+                                <x-dropdown-link :href="route('vendor-invoices.index')" :active="request()->routeIs('vendor-invoices.*')">
+                                    Vendor Invoices
                                 </x-dropdown-link>
                                 <x-dropdown-link :href="route('finance.categories.index')" disabled>
                                     Categories
@@ -84,7 +87,7 @@
                         </a>
 
                         <!-- Products Dropdown -->
-                        <x-nav-dropdown active="{{ request()->routeIs(['products.*', 'categories.*', 'units.*', 'companies.*', 'master.companies.*']) }}">
+                        <x-nav-dropdown active="{{ request()->routeIs(['products.*', 'inventory.*', 'categories.*', 'units.*', 'companies.*', 'master.companies.*']) }}">
                             <x-slot name="icon">
                                 <x-heroicon-o-cube class="mr-2 h-4 w-4" />
                             </x-slot>
@@ -94,6 +97,9 @@
                             <x-slot name="content">
                                 <x-dropdown-link :href="route('products.index')" :active="request()->routeIs('products.*')">
                                     Products
+                                </x-dropdown-link>
+                                <x-dropdown-link :href="route('inventory.index')" :active="request()->routeIs('inventory.*')">
+                                    Inventory
                                 </x-dropdown-link>
                                 <x-dropdown-link :href="route('companies.index')" :active="request()->routeIs(['companies.*', 'master.companies.*'])">
                                     Brands / Companies
@@ -226,14 +232,15 @@
                         </div>
 
                         <!-- Mobile Finance Accordion -->
-                        <div x-data="{ expanded: {{ request()->routeIs(['finance.*']) ? 'true' : 'false' }} }" class="border-b-0">
-                            <button @click="expanded = !expanded" class="flex flex-1 items-center justify-between py-0 font-semibold transition-all hover:underline [&[data-state=open]>svg]:rotate-180 w-full text-left text-md {{ request()->routeIs(['finance.*']) ? 'text-primary' : '' }}">
+                        <div x-data="{ expanded: {{ request()->routeIs(['finance.*', 'vendor-invoices.*']) ? 'true' : 'false' }} }" class="border-b-0">
+                            <button @click="expanded = !expanded" class="flex flex-1 items-center justify-between py-0 font-semibold transition-all hover:underline [&[data-state=open]>svg]:rotate-180 w-full text-left text-md {{ request()->routeIs(['finance.*', 'vendor-invoices.*']) ? 'text-primary' : '' }}">
                                 Finance
                                 <x-heroicon-o-chevron-down :class="{'rotate-180': expanded}" class="h-4 w-4 shrink-0 transition-transform duration-200" />
                             </button>
                             <div x-show="expanded" x-collapse>
                                 <div class="mt-2 flex flex-col gap-2 pl-4 border-l border-border ml-2">
                                     <span class="text-sm font-medium py-1 text-muted-foreground/60 cursor-not-allowed select-none">Transactions</span>
+                                    <a class="text-sm font-medium hover:underline py-1 {{ request()->routeIs('vendor-invoices.*') ? 'text-primary' : '' }}" href="{{ route('vendor-invoices.index') }}">Vendor Invoices</a>
                                     <span class="text-sm font-medium py-1 text-muted-foreground/60 cursor-not-allowed select-none">Categories</span>
                                 </div>
                             </div>
@@ -243,14 +250,15 @@
                         <a href="{{ route('users.index') }}" class="text-md font-semibold hover:underline border-b pb-4 {{ request()->routeIs('users.*') ? 'text-primary' : '' }}">Users</a>
 
                         <!-- Mobile Products Accordion -->
-                        <div x-data="{ expanded: {{ request()->routeIs(['products.*', 'categories.*', 'units.*', 'companies.*', 'master.companies.*']) ? 'true' : 'false' }} }" class="border-b-0">
-                            <button @click="expanded = !expanded" class="flex flex-1 items-center justify-between py-0 font-semibold transition-all hover:underline [&[data-state=open]>svg]:rotate-180 w-full text-left text-md {{ request()->routeIs(['products.*', 'categories.*', 'units.*', 'companies.*', 'master.companies.*']) ? 'text-primary' : '' }}">
+                        <div x-data="{ expanded: {{ request()->routeIs(['products.*', 'inventory.*', 'categories.*', 'units.*', 'companies.*', 'master.companies.*']) ? 'true' : 'false' }} }" class="border-b-0">
+                            <button @click="expanded = !expanded" class="flex flex-1 items-center justify-between py-0 font-semibold transition-all hover:underline [&[data-state=open]>svg]:rotate-180 w-full text-left text-md {{ request()->routeIs(['products.*', 'inventory.*', 'categories.*', 'units.*', 'companies.*', 'master.companies.*']) ? 'text-primary' : '' }}">
                                 Products
                                 <x-heroicon-o-chevron-down :class="{'rotate-180': expanded}" class="h-4 w-4 shrink-0 transition-transform duration-200" />
                             </button>
                             <div x-show="expanded" x-collapse>
                                 <div class="mt-2 flex flex-col gap-2 pl-4 border-l border-border ml-2">
                                     <a class="text-sm font-medium hover:underline py-1 {{ request()->routeIs('products.index') ? 'text-primary' : '' }}" href="{{ route('products.index') }}">Products</a>
+                                    <a class="text-sm font-medium hover:underline py-1 {{ request()->routeIs('inventory.*') ? 'text-primary' : '' }}" href="{{ route('inventory.index') }}">Inventory</a>
                                     <a class="text-sm font-medium hover:underline py-1 {{ request()->routeIs(['companies.*', 'master.companies.*']) ? 'text-primary' : '' }}" href="{{ route('companies.index') }}">Brands / Companies</a>
                                     <a class="text-sm font-medium hover:underline py-1 {{ request()->routeIs('categories.index') ? 'text-primary' : '' }}" href="{{ route('categories.index') }}">Categories</a>
                                     <a class="text-sm font-medium hover:underline py-1 {{ request()->routeIs('units.index') ? 'text-primary' : '' }}" href="{{ route('units.index') }}">Units</a>

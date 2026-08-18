@@ -89,7 +89,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 gap-4 rounded-lg border border-gray-200 bg-white p-4 md:grid-cols-2">
+                <div class="grid grid-cols-1 gap-4 rounded-lg border border-gray-200 bg-white p-4 md:grid-cols-3">
                     @unless($purchase->invoice_number)
                         <div class="space-y-2">
                             <x-input-label for="invoice_number" :value="__('Final Invoice Number')" required hint="Supplier invoice number received with the goods. Example: INV-2026-001." />
@@ -116,6 +116,25 @@
                             <p class="text-xs text-gray-500">Optional image (JPG, PNG) max 2MB.</p>
                         @endif
                         <x-input-error :messages="$errors->get('proof_image')" class="mt-2" />
+                    </div>
+
+                    <div class="space-y-2">
+                        <x-input-label for="vendor_invoice_number" :value="__('Vendor Invoice Number')" hint="Invoice number printed on the supplier invoice. Example: INV-2026-001." />
+                        <x-text-input id="vendor_invoice_number" name="vendor_invoice_number" :value="old('vendor_invoice_number')" placeholder="INV...." />
+                        <x-input-error :messages="$errors->get('vendor_invoice_number')" class="mt-2" />
+                    </div>
+
+                    <div class="space-y-2">
+                        <x-input-label for="vendor_invoice_file" :value="__('Vendor Invoice File')" hint="Invoice document sent by supplier. Example: supplier-invoice.pdf." />
+                        <input
+                            id="vendor_invoice_file"
+                            type="file"
+                            name="vendor_invoice_file"
+                            accept="application/pdf,image/jpeg,image/png,image/webp"
+                            class="block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-emerald-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-emerald-700 hover:file:bg-emerald-100"
+                        />
+                        <p class="text-xs text-gray-500">Optional PDF or image max 10MB.</p>
+                        <x-input-error :messages="$errors->get('vendor_invoice_file')" class="mt-2" />
                     </div>
                 </div>
 

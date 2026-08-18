@@ -73,6 +73,16 @@ class Product extends Model
         return $this->hasMany(PurchaseItem::class);
     }
 
+    public function inventoryStock()
+    {
+        return $this->hasOne(InventoryStock::class);
+    }
+
+    public function inventoryMovements()
+    {
+        return $this->hasMany(InventoryMovement::class);
+    }
+
     public function saleItems()
     {
         return $this->hasMany(SaleItem::class);
