@@ -17,7 +17,7 @@
                 <div class="flex justify-center sm:justify-start">
                     <x-avatar
                         :name="$user->name"
-                        :src="$user->profile_photo_path ? Storage::url($user->profile_photo_path) : null"
+                        :src="$user->profile_photo_path ? public_storage_url($user->profile_photo_path) : null"
                         class="h-20 w-20"
                     />
                 </div>

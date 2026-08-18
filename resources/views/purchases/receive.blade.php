@@ -108,7 +108,7 @@
                             class="block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700 hover:file:bg-indigo-100"
                         />
                         @if($purchase->proof_image)
-                            <a href="{{ Storage::url($purchase->proof_image) }}" target="_blank" class="inline-flex items-center gap-1 text-sm text-indigo-600 hover:underline">
+                            <a href="{{ public_storage_url($purchase->proof_image) }}" target="_blank" class="inline-flex items-center gap-1 text-sm text-indigo-600 hover:underline">
                                 <x-heroicon-o-paper-clip class="h-4 w-4" />
                                 View current proof image
                             </a>

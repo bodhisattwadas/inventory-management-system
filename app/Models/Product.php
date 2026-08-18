@@ -46,7 +46,7 @@ class Product extends Model
         $path = ltrim($this->image_path, '/');
         $path = str_starts_with($path, 'storage/') ? substr($path, 8) : $path;
 
-        return asset('storage/'.$path);
+        return public_storage_url($path);
     }
 
     public function category()

@@ -168,7 +168,7 @@
                             <div>
                                 <label class="text-sm font-medium leading-none text-gray-500">Proof of Receipt</label>
                                 <div class="mt-1">
-                                    <a href="{{ Storage::url($purchase->proof_image) }}" target="_blank" class="text-indigo-600 hover:underline text-sm flex items-center gap-1">
+                                    <a href="{{ public_storage_url($purchase->proof_image) }}" target="_blank" class="text-indigo-600 hover:underline text-sm flex items-center gap-1">
                                         <x-heroicon-o-paper-clip class="w-4 h-4" />
                                         View Image
                                     </a>

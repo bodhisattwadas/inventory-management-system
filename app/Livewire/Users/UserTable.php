@@ -54,7 +54,7 @@ final class UserTable extends PowerGridComponent
                     return '<div class="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center text-xs text-gray-500">' . e(strtoupper(substr($model->name, 0, 1))) . '</div>';
                 }
 
-                return '<img src="' . e(Storage::url($model->profile_photo_path)) . '" alt="' . e($model->name) . '" class="h-9 w-9 rounded-full object-cover">';
+                return '<img src="' . e(public_storage_url($model->profile_photo_path)) . '" alt="' . e($model->name) . '" class="h-9 w-9 rounded-full object-cover">';
             })
             ->add('name')
             ->add('username')

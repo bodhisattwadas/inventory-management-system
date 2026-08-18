@@ -26,7 +26,7 @@
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
                     <x-avatar
                         :name="$name ?: 'User'"
-                        :src="$profile_photo ? $profile_photo->temporaryUrl() : ($currentProfilePhotoPath ? Storage::url($currentProfilePhotoPath) : null)"
+                        :src="$profile_photo ? $profile_photo->temporaryUrl() : ($currentProfilePhotoPath ? public_storage_url($currentProfilePhotoPath) : null)"
                         class="h-20 w-20"
                     />
                     <div class="flex-1 space-y-2">

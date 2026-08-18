@@ -9,6 +9,17 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\VendorProfileController;
 use App\Http\Controllers\SupplierProfileController;
 use App\Http\Controllers\VendorInvoiceController;
+use Illuminate\Support\Facades\Storage;
+
+Route::get('media/{path}', function (string $path) {
+    $path = ltrim($path, '/');
+
+    if (str_contains($path, '..') || ! Storage::disk('public')->exists($path)) {
+        abort(404);
+    }
+
+    return response()->file(Storage::disk('public')->path($path));
+})->where('path', '.*')->name('media.public');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // =========================================================================
