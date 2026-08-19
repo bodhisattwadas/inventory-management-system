@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class VendorInvoiceService
 {
-    public function createFromPurchase(Purchase $purchase, ?string $invoiceNumber, ?string $documentPath): VendorInvoice
+    public function createFromPurchase(Purchase $purchase, ?string $invoiceNumber, ?string $documentPath, ?string $orderReceivedDate = null): VendorInvoice
     {
         $amount = (int) $purchase->items->sum(function ($item) {
             return ((int) ($item->received_quantity ?? $item->quantity)) * ((int) $item->unit_price);
@@ -23,6 +23,7 @@ class VendorInvoiceService
                 'po_reference' => $purchase->invoice_number,
                 'invoice_number' => $invoiceNumber,
                 'invoice_date' => now()->toDateString(),
+                'order_received_date' => $orderReceivedDate ?: now()->toDateString(),
                 'amount' => $amount,
                 'document_path' => $documentPath ?: VendorInvoice::where('purchase_id', $purchase->id)->value('document_path'),
                 'status' => VendorInvoiceStatus::UNPAID,

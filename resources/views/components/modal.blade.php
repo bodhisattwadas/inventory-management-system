@@ -2,6 +2,8 @@
     'name',
     'title' => '',
     'maxWidth' => '2xl',
+    'closeOnOutside' => true,
+    'closeOnEscape' => true,
 ])
 
 @php
@@ -26,7 +28,7 @@ $maxWidth = $maxWidthClasses[$maxWidth] ?? $maxWidthClasses['2xl'];
     x-on:open-modal.window="if ($event.detail.name === '{{ $name }}') show = true"
     x-on:close-modal.window="if ($event.detail.name === '{{ $name }}') show = false"
     x-on:close.stop="show = false"
-    x-on:keydown.escape.window="show = false"
+    x-on:keydown.escape.window="@if($closeOnEscape) show = false @endif"
     x-show="show"
     class="fixed inset-0 overflow-y-auto px-4 py-6 sm:px-0 z-50"
     style="display: none;"
@@ -47,7 +49,7 @@ $maxWidth = $maxWidthClasses[$maxWidth] ?? $maxWidthClasses['2xl'];
     </div>
 
     <!-- Modal Content -->
-    <div class="fixed inset-0 z-10 w-screen overflow-y-auto" x-on:click="show = false">
+    <div class="fixed inset-0 z-10 w-screen overflow-y-auto" x-on:click="@if($closeOnOutside) show = false @endif">
         <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <div
                 x-show="show"

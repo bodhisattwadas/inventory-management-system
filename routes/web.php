@@ -32,6 +32,32 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('profile', 'profile.index')->name('profile.index');
     Route::view('companies', 'companies.index')->name('companies.index');
     Route::view('inventory', 'inventory.index')->name('inventory.index');
+    Route::get('inventory/{inventoryStock}', function (\App\Models\InventoryStock $inventoryStock) {
+        $inventoryStock->load([
+            'product.category',
+            'product.unit',
+            'product.company',
+            'product.purchaseItems.purchase.supplier',
+        ]);
+
+        return view('inventory.show', compact('inventoryStock'));
+    })->name('inventory.show');
+    Route::patch('inventory/{inventoryStock}/batches/{purchaseItem}', function (
+        \Illuminate\Http\Request $request,
+        \App\Models\InventoryStock $inventoryStock,
+        \App\Models\PurchaseItem $purchaseItem
+    ) {
+        abort_unless((int) $purchaseItem->product_id === (int) $inventoryStock->product_id, 404);
+
+        $validated = $request->validate([
+            'manufacturing_date' => ['nullable', 'date'],
+            'expiry_date' => ['nullable', 'date', 'after_or_equal:manufacturing_date'],
+        ]);
+
+        $purchaseItem->update($validated);
+
+        return back()->with('success', 'Batch dates updated successfully.');
+    })->name('inventory.batches.update');
     Route::get('companies/{company}', [CompanyController::class, 'show'])->name('companies.show');
     Route::delete('companies/{company}', [CompanyController::class, 'destroy'])->name('companies.destroy');
     Route::get('vendors/{vendor}/profile.pdf', [VendorProfileController::class, 'download'])->name('vendors.profile.pdf');

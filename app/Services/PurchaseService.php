@@ -117,9 +117,9 @@ class PurchaseService
         });
     }
 
-    public function markAsReceived(Purchase $purchase, array $receivedQuantities = []): void
+    public function markAsReceived(Purchase $purchase, array $receivedQuantities = [], array $itemReceiptDates = []): void
     {
-        DB::transaction(function () use ($purchase, $receivedQuantities) {
+        DB::transaction(function () use ($purchase, $receivedQuantities, $itemReceiptDates) {
             if (!in_array($purchase->status, [PurchaseStatus::ORDERED, PurchaseStatus::DRAFT])) {
                 throw PurchaseException::invalidStatus('receive', $purchase->status->label(), ['id' => $purchase->id]);
             }
@@ -138,7 +138,17 @@ class PurchaseService
                     throw PurchaseException::updateFailed("Received quantity cannot be negative.", ['item_id' => $item->id]);
                 }
 
-                $item->update(['received_quantity' => $receivedQuantity]);
+                $receiptDate = $itemReceiptDates[$item->id]['order_received_date'] ?? now()->toDateString();
+                $batchNumber = $receivedQuantity > 0
+                    ? ($item->batch_number ?: $this->generateBatchNumber(Carbon::parse($receiptDate)))
+                    : null;
+
+                $item->update([
+                    'received_quantity' => $receivedQuantity,
+                    'batch_number' => $batchNumber,
+                    'manufacturing_date' => $itemReceiptDates[$item->id]['manufacturing_date'] ?? null,
+                    'expiry_date' => $itemReceiptDates[$item->id]['expiry_date'] ?? null,
+                ]);
 
                 // Lock the product row for update to prevent race conditions
                 $product = Product::where('id', $item->product_id)->lockForUpdate()->first();
@@ -278,5 +288,29 @@ class PurchaseService
         } while (Purchase::query()->where('invoice_number', $reference)->exists());
 
         return $reference;
+    }
+
+    private function generateBatchNumber(?Carbon $batchDate = null, bool $lock = true): string
+    {
+        $prefix = 'BN-'.($batchDate ?? now())->format('Ymd').'-';
+        $query = PurchaseItem::query()
+            ->where('batch_number', 'like', $prefix.'%');
+
+        if ($lock) {
+            $query->lockForUpdate();
+        }
+
+        $lastBatchNumber = $query->orderByDesc('batch_number')->value('batch_number');
+
+        $nextNumber = $lastBatchNumber
+            ? ((int) substr($lastBatchNumber, -4)) + 1
+            : 1;
+
+        do {
+            $batchNumber = $prefix.str_pad((string) $nextNumber, 4, '0', STR_PAD_LEFT);
+            $nextNumber++;
+        } while (PurchaseItem::query()->where('batch_number', $batchNumber)->exists());
+
+        return $batchNumber;
     }
 }

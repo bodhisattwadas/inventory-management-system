@@ -125,6 +125,12 @@
                     </div>
 
                     <div class="space-y-2">
+                        <x-input-label for="order_received_date" :value="__('Order Received Date')" required hint="Date when goods were physically received. Example: today." />
+                        <x-text-input id="order_received_date" type="date" name="order_received_date" :value="old('order_received_date', now()->toDateString())" required />
+                        <x-input-error :messages="$errors->get('order_received_date')" class="mt-2" />
+                    </div>
+
+                    <div class="space-y-2">
                         <x-input-label for="vendor_invoice_file" :value="__('Vendor Invoice File')" hint="Invoice document sent by supplier. Example: supplier-invoice.pdf." />
                         <input
                             id="vendor_invoice_file"
@@ -147,6 +153,8 @@
                                     <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Brand</th>
                                     <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">Ordered</th>
                                     <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">Received</th>
+                                    <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">MFG Date</th>
+                                    <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">Expiry Date</th>
                                     <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">MRP</th>
                                     <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">Discount %</th>
                                     <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Unit Price</th>
@@ -170,6 +178,14 @@
                                             <input type="number" name="items[{{ $item->id }}][received_quantity]" x-model.number="items[{{ $loop->index }}].received" min="0" class="w-24 rounded-md border-gray-300 text-center text-sm">
                                             <x-input-error :messages="$errors->get('items.'.$item->id.'.received_quantity')" class="mt-1" />
                                         </td>
+                                        <td class="px-4 py-3 text-center">
+                                            <input type="date" name="items[{{ $item->id }}][manufacturing_date]" value="{{ old('items.'.$item->id.'.manufacturing_date', $item->manufacturing_date?->format('Y-m-d')) }}" class="w-36 rounded-md border-gray-300 text-sm">
+                                            <x-input-error :messages="$errors->get('items.'.$item->id.'.manufacturing_date')" class="mt-1" />
+                                        </td>
+                                        <td class="px-4 py-3 text-center">
+                                            <input type="date" name="items[{{ $item->id }}][expiry_date]" value="{{ old('items.'.$item->id.'.expiry_date', $item->expiry_date?->format('Y-m-d')) }}" class="w-36 rounded-md border-gray-300 text-sm">
+                                            <x-input-error :messages="$errors->get('items.'.$item->id.'.expiry_date')" class="mt-1" />
+                                        </td>
                                         <td class="px-4 py-3 text-right text-sm">{{ format_money($mrp) }}</td>
                                         <td class="px-4 py-3 text-center text-sm">{{ number_format($discount, 2) }}%</td>
                                         <td class="px-4 py-3 text-right text-sm">{{ format_money($item->unit_price) }}</td>
@@ -179,7 +195,7 @@
                             </tbody>
                             <tfoot class="bg-gray-50">
                                 <tr>
-                                    <td colspan="7" class="px-4 py-4 text-right font-bold">Total Received Value</td>
+                                    <td colspan="9" class="px-4 py-4 text-right font-bold">Total Received Value</td>
                                     <td class="px-4 py-4 text-right text-lg font-bold text-green-600" x-text="window.formatMoney(total)"></td>
                                 </tr>
                             </tfoot>

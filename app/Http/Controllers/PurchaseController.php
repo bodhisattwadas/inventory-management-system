@@ -179,6 +179,8 @@ class PurchaseController extends Controller
         $rules = [
             'items' => ['required', 'array'],
             'items.*.received_quantity' => ['required', 'integer', 'min:0'],
+            'items.*.manufacturing_date' => ['nullable', 'date'],
+            'items.*.expiry_date' => ['nullable', 'date'],
         ];
 
         // Only validate invoice_number if it's not already set on the purchase
@@ -187,6 +189,7 @@ class PurchaseController extends Controller
         }
 
         $rules['vendor_invoice_number'] = ['nullable', 'string', 'max:255'];
+        $rules['order_received_date'] = ['required', 'date'];
         $rules['proof_image'] = ['nullable', 'image', 'max:2048'];
         $rules['vendor_invoice_file'] = ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:10240'];
 
@@ -216,12 +219,21 @@ class PurchaseController extends Controller
                 ->mapWithKeys(fn(array $item, int|string $itemId) => [$itemId => $item['received_quantity']])
                 ->all();
 
-            $this->service->markAsReceived($purchase, $receivedQuantities);
+            $itemReceiptDates = collect($validated['items'] ?? [])
+                ->mapWithKeys(fn(array $item, int|string $itemId) => [$itemId => [
+                    'order_received_date' => $validated['order_received_date'],
+                    'manufacturing_date' => $item['manufacturing_date'] ?? null,
+                    'expiry_date' => $item['expiry_date'] ?? null,
+                ]])
+                ->all();
+
+            $this->service->markAsReceived($purchase, $receivedQuantities, $itemReceiptDates);
             $purchase->refresh()->load('items');
             $vendorInvoiceService->createFromPurchase(
                 $purchase,
                 $request->filled('vendor_invoice_number') ? $request->vendor_invoice_number : null,
-                $vendorInvoicePath
+                $vendorInvoicePath,
+                $validated['order_received_date']
             );
 
             return redirect()->route('purchases.show', $purchase)

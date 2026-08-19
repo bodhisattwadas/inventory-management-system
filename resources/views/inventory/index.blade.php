@@ -12,4 +12,5 @@
             <livewire:inventory.inventory-table />
         </div>
     </div>
+
 </x-app-layout>

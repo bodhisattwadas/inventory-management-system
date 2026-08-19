@@ -45,6 +45,7 @@
                             <x-detail-item label="PO Reference" :value="$vendorInvoice->po_reference" />
                             <x-detail-item label="Vendor Invoice Number" :value="$vendorInvoice->invoice_number ?: '-'" />
                             <x-detail-item label="Invoice Date" :value="$vendorInvoice->invoice_date?->format('d/m/Y') ?: '-'" />
+                            <x-detail-item label="Order Received Date" :value="$vendorInvoice->order_received_date?->format('d/m/Y') ?: '-'" />
                         </div>
                         <div class="space-y-5">
                             <x-detail-item label="Supplier / Vendor" :value="$vendorInvoice->supplier?->name ?: '-'" />
