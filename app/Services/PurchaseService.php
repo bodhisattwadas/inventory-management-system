@@ -10,6 +10,7 @@ use App\Models\PurchaseItem;
 use App\Enums\PurchaseStatus;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\Exceptions\PurchaseException;
 
 class PurchaseService
@@ -142,13 +143,23 @@ class PurchaseService
                 $batchNumber = $receivedQuantity > 0
                     ? ($item->batch_number ?: $this->generateBatchNumber(Carbon::parse($receiptDate)))
                     : null;
+                $updatedUnitPrice = isset($itemReceiptDates[$item->id]['unit_price'])
+                    ? (int) $itemReceiptDates[$item->id]['unit_price']
+                    : (int) $item->unit_price;
+                $updatedSellingPrice = isset($itemReceiptDates[$item->id]['selling_price'])
+                    ? (int) $itemReceiptDates[$item->id]['selling_price']
+                    : (int) $item->selling_price;
 
                 $item->update([
                     'received_quantity' => $receivedQuantity,
                     'batch_number' => $batchNumber,
                     'manufacturing_date' => $itemReceiptDates[$item->id]['manufacturing_date'] ?? null,
                     'expiry_date' => $itemReceiptDates[$item->id]['expiry_date'] ?? null,
+                    'unit_price' => $updatedUnitPrice,
+                    'selling_price' => $updatedSellingPrice,
+                    'subtotal' => ((int) $item->quantity) * $updatedUnitPrice,
                 ]);
+                $item->refresh();
 
                 // Lock the product row for update to prevent race conditions
                 $product = Product::where('id', $item->product_id)->lockForUpdate()->first();
@@ -161,6 +172,23 @@ class PurchaseService
                     $updateData = ['purchase_price' => $item->unit_price];
                     $priceChangeLog = "";
                     $hasPriceChange = false;
+                    $ref = $purchase->invoice_number ? "PO #{$purchase->invoice_number}" : "Purchase #{$purchase->id}";
+                    $newProductMrp = isset($itemReceiptDates[$item->id]['product_mrp'])
+                        ? (int) $itemReceiptDates[$item->id]['product_mrp']
+                        : null;
+
+                    if ($newProductMrp !== null && (int) $product->mrp !== $newProductMrp) {
+                        $oldMrp = (int) $product->mrp;
+                        $updateData['mrp'] = $newProductMrp;
+                        $product->priceHistories()->create([
+                            'changed_by' => Auth::id(),
+                            'source' => 'purchase_receive',
+                            'reference' => $ref,
+                            'old_mrp' => $oldMrp,
+                            'new_mrp' => $newProductMrp,
+                            'notes' => 'MRP updated while receiving purchase order.',
+                        ]);
+                    }
 
                     // Check for Purchase Price Change
                     if ((float) $product->purchase_price !== (float) $item->unit_price) {
@@ -184,16 +212,19 @@ class PurchaseService
                     // Append to Notes if prices changed
                     if ($hasPriceChange) {
                         $timestamp = now()->format('Y-m-d H:i');
-                        $ref = $purchase->invoice_number ? "PO #{$purchase->invoice_number}" : "Purchase #{$purchase->id}";
                         $logHeader = "\n\n[System Log - {$timestamp}] Price update via {$ref}:";
                         $updateData['notes'] = TRIM(($product->notes ?? '') . $logHeader . $priceChangeLog);
+
                     }
 
                     $product->update($updateData);
                 }
             }
 
-            $purchase->update(['status' => PurchaseStatus::RECEIVED]);
+            $purchase->update([
+                'status' => PurchaseStatus::RECEIVED,
+                'total' => $purchase->items()->sum('subtotal'),
+            ]);
         });
     }
 

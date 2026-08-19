@@ -242,5 +242,11 @@
                 </x-primary-button>
             </div>
         </form>
+
+        @if($isEditing && $product)
+            <div class="mt-6">
+                @include('products.partials.price-history', ['product' => $product])
+            </div>
+        @endif
     </div>
 </x-modal>

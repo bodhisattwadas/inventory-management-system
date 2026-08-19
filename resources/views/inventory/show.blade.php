@@ -97,6 +97,7 @@
                                 <th class="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">{{ __('PO Reference') }}</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">{{ __('Supplier / Vendor') }}</th>
                                 <th class="px-4 py-3 text-center text-xs font-medium uppercase text-gray-500">{{ __('Received Qty') }}</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium uppercase text-gray-500">{{ __('Net Price') }}</th>
                                 <th class="px-4 py-3 text-center text-xs font-medium uppercase text-gray-500">{{ __('MFG Date') }}</th>
                                 <th class="px-4 py-3 text-center text-xs font-medium uppercase text-gray-500">{{ __('Expiry Date') }}</th>
                                 <th class="px-4 py-3 text-center text-xs font-medium uppercase text-gray-500">{{ __('') }}</th>
@@ -117,6 +118,7 @@
                                     </td>
                                     <td class="px-4 py-3 text-sm text-gray-900">{{ $item->purchase?->supplier?->name ?: '-' }}</td>
                                     <td class="px-4 py-3 text-center text-sm font-semibold text-gray-900">{{ $item->received_quantity }}</td>
+                                    <td class="px-4 py-3 text-right text-sm font-semibold text-gray-900">{{ format_money($item->unit_price) }}</td>
                                     <td class="px-4 py-3 text-center text-sm text-gray-700">{{ $item->manufacturing_date?->format('d/m/Y') ?: '-' }}</td>
                                     <td class="px-4 py-3 text-center text-sm font-semibold {{ $item->expiry_date && $item->expiry_date->isPast() ? 'text-red-700' : 'text-gray-900' }}">
                                         {{ $item->expiry_date?->format('d/m/Y') ?: '-' }}
@@ -124,7 +126,8 @@
                                     <td class="px-4 py-3 text-center">
                                         <button
                                             type="button"
-                                            class="inline-flex h-8 items-center justify-center gap-1.5 rounded-md bg-amber-500 px-3 text-xs font-semibold text-white hover:bg-amber-600"
+                                            class="inline-flex h-8 w-8 items-center justify-center rounded-md bg-amber-500 text-white hover:bg-amber-600"
+                                            title="{{ __('Update Batch') }}"
                                             x-on:click="editBatch({
                                                 number: @js($item->batch_number ?: '-'),
                                                 action: @js(route('inventory.batches.update', [$inventoryStock, $item])),
@@ -133,13 +136,12 @@
                                             })"
                                         >
                                             <x-heroicon-o-pencil-square class="h-4 w-4" />
-                                            {{ __('Update') }}
                                         </button>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="px-4 py-8 text-center text-sm text-gray-500">{{ __('No received batches found for this product.') }}</td>
+                                    <td colspan="8" class="px-4 py-8 text-center text-sm text-gray-500">{{ __('No received batches found for this product.') }}</td>
                                 </tr>
                             @endforelse
                         </tbody>

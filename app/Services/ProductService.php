@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use App\DTOs\ProductData;
 use App\Exceptions\ProductException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class ProductService
@@ -21,7 +22,7 @@ class ProductService
             try {
                 $sku = $data->sku ?? $this->generateUniqueSku();
 
-                return Product::create([
+                $product = Product::create([
                     'category_id' => $data->category_id,
                     'unit_id' => $data->unit_id,
                     'company_id' => $data->company_id,
@@ -37,6 +38,16 @@ class ProductService
                     'notes' => $data->notes,
                     'image_path' => $data->image_path,
                 ]);
+
+                $product->priceHistories()->create([
+                    'changed_by' => Auth::id(),
+                    'source' => 'product',
+                    'reference' => 'Initial product price',
+                    'new_mrp' => $product->mrp,
+                    'notes' => 'Product created.',
+                ]);
+
+                return $product;
 
             } catch (Exception $e) {
                 throw ProductException::creationFailed($e->getMessage(), [
@@ -55,6 +66,9 @@ class ProductService
         return DB::transaction(function () use ($product, $data) {
             try {
                 $oldImagePath = $product->image_path;
+                $oldPrices = [
+                    'mrp' => (int) $product->mrp,
+                ];
 
                 $product->update([
                     'category_id' => $data->category_id,
@@ -74,6 +88,18 @@ class ProductService
 
                 if ($data->image_path && $oldImagePath && $oldImagePath !== $data->image_path) {
                     Storage::disk('public')->delete($oldImagePath);
+                }
+
+                if (
+                    $oldPrices['mrp'] !== (int) $product->mrp
+                ) {
+                    $product->priceHistories()->create([
+                        'changed_by' => Auth::id(),
+                        'source' => 'product',
+                        'reference' => 'Product edit',
+                        'old_mrp' => $oldPrices['mrp'],
+                        'new_mrp' => $product->mrp,
+                    ]);
                 }
 
                 return $product->refresh();

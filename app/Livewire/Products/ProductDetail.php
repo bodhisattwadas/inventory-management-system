@@ -18,7 +18,7 @@ class ProductDetail extends Component
     #[On('show-product')]
     public function show(Product $product): void
     {
-        $this->product = $product->load(['category', 'unit', 'company']);
+        $this->product = $product->load(['category', 'unit', 'company', 'priceHistories.changedBy']);
         $this->dispatch('open-modal', name: 'product-detail-modal');
     }
 

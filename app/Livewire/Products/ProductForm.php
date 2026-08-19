@@ -63,7 +63,7 @@ class ProductForm extends Component
     #[On('edit-product')]
     public function edit(Product $product): void
     {
-        $this->product = $product;
+        $this->product = $product->load('priceHistories.changedBy');
         $this->sku = $product->sku;
         $this->name = $product->name;
         $this->category_id = $product->category_id;

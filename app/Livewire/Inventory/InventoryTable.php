@@ -58,10 +58,10 @@ final class InventoryTable extends PowerGridComponent
     {
         return [
             Column::action('')->visibleInExport(false),
-            Column::make('SKU', 'sku')->searchable()->sortable(),
-            Column::make('Product', 'product_name')->searchable()->sortable(),
-            Column::make('Brand / Company', 'brand_name')->searchable()->sortable(),
-            Column::make('Category', 'category_name')->searchable()->sortable(),
+            Column::make('SKU', 'sku')->searchable()->sortable()->headerAttribute('text-center'),
+            Column::make('Product', 'product_name')->searchable()->sortable()->headerAttribute('text-center'),
+            Column::make('Brand / Company', 'brand_name')->searchable()->sortable()->headerAttribute('text-center'),
+            Column::make('Category', 'category_name')->searchable()->sortable()->headerAttribute('text-center'),
             Column::make('Quantity', 'quantity_with_unit', 'quantity')->sortable()->headerAttribute('text-center')->bodyAttribute('text-center'),
             Column::make('Batch Quantity', 'batch_quantities')->headerAttribute('text-center')->bodyAttribute('text-center')->visibleInExport(false),
             Column::make('Min Quantity', 'min_stock_with_unit', 'min_stock')->headerAttribute('text-center')->bodyAttribute('text-center'),
@@ -108,19 +108,22 @@ final class InventoryTable extends PowerGridComponent
         }
 
         $colors = [
-            'border-blue-200 bg-blue-50 text-blue-700',
-            'border-emerald-200 bg-emerald-50 text-emerald-700',
-            'border-amber-200 bg-amber-50 text-amber-700',
-            'border-fuchsia-200 bg-fuchsia-50 text-fuchsia-700',
-            'border-cyan-200 bg-cyan-50 text-cyan-700',
+            'border-blue-300 bg-blue-50 text-blue-800',
+            'border-emerald-300 bg-emerald-50 text-emerald-800',
+            'border-amber-300 bg-amber-50 text-amber-800',
+            'border-fuchsia-300 bg-fuchsia-50 text-fuchsia-800',
+            'border-cyan-300 bg-cyan-50 text-cyan-800',
+            'border-rose-300 bg-rose-50 text-rose-800',
+            'border-violet-300 bg-violet-50 text-violet-800',
+            'border-lime-300 bg-lime-50 text-lime-800',
         ];
 
-        $html = '<div class="flex max-w-72 flex-wrap justify-center gap-1">';
+        $html = '<div class="flex max-w-80 flex-wrap justify-center gap-1">';
 
         foreach ($batches as $index => $batch) {
-            $label = ($batch->batch_number ?: 'Batch').' : '.(int) $batch->received_quantity;
+            $label = ($batch->batch_number ?: 'Batch').' : '.(int) $batch->received_quantity.' @ '.format_money($batch->unit_price);
             $class = $colors[$index % count($colors)];
-            $html .= '<span class="inline-flex w-44 shrink-0 justify-between rounded-full border px-2 py-0.5 font-mono text-[10px] font-semibold leading-tight '.$class.'" title="'.e($label).'"><span>'.e($batch->batch_number ?: 'Batch').'</span><span class="pl-2">'.e((string) (int) $batch->received_quantity).'</span></span>';
+            $html .= '<span class="inline-grid w-64 shrink-0 grid-cols-[8.75rem_2.25rem_5rem] items-center rounded-full border px-2 py-0.5 font-mono text-[10px] font-bold leading-tight '.$class.'" title="'.e($label).'"><span class="truncate pr-2 text-left">'.e($batch->batch_number ?: 'Batch').'</span><span class="border-l border-current/25 px-2 text-center">'.e((string) (int) $batch->received_quantity).'</span><span class="border-l border-current/25 pl-2 text-right">'.e(format_money($batch->unit_price)).'</span></span>';
         }
 
         $html .= '</div>';

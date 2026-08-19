@@ -181,6 +181,9 @@ class PurchaseController extends Controller
             'items.*.received_quantity' => ['required', 'integer', 'min:0'],
             'items.*.manufacturing_date' => ['nullable', 'date'],
             'items.*.expiry_date' => ['nullable', 'date'],
+            'items.*.product_mrp' => ['nullable', 'integer', 'min:0'],
+            'items.*.unit_price' => ['nullable', 'integer', 'min:0'],
+            'items.*.selling_price' => ['nullable', 'integer', 'min:0'],
         ];
 
         // Only validate invoice_number if it's not already set on the purchase
@@ -224,6 +227,9 @@ class PurchaseController extends Controller
                     'order_received_date' => $validated['order_received_date'],
                     'manufacturing_date' => $item['manufacturing_date'] ?? null,
                     'expiry_date' => $item['expiry_date'] ?? null,
+                    'product_mrp' => $item['product_mrp'] ?? null,
+                    'unit_price' => $item['unit_price'] ?? null,
+                    'selling_price' => $item['selling_price'] ?? null,
                 ]])
                 ->all();
 

@@ -33,19 +33,59 @@
                 enctype="multipart/form-data"
                 x-data="{
                     submitting: false,
+                    priceModal: {
+                        index: null,
+                        product: '',
+                        sku: '',
+                        value: 0,
+                        discount: 0,
+                    },
                     items: [
                         @foreach($purchase->items as $item)
+                            @php
+                                $initialMrp = (int) ($item->selling_price ?: $item->unit_price);
+                                $initialDiscount = $initialMrp > 0 ? round((1 - ((int) $item->unit_price / $initialMrp)) * 100, 2) : 0;
+                            @endphp
                             {
                                 id: {{ $item->id }},
+                                product: @js($item->product->name ?? '-'),
+                                sku: @js($item->product->sku ?? $item->product->code ?? ''),
                                 ordered: {{ (int) $item->quantity }},
                                 received: {{ (int) old('items.'.$item->id.'.received_quantity', $item->received_quantity ?? $item->quantity) }},
                                 unitPrice: {{ (int) $item->unit_price }},
-                                mrp: {{ (int) ($item->selling_price ?: $item->unit_price) }},
+                                mrp: {{ $initialMrp }},
+                                productMrp: {{ (int) old('items.'.$item->id.'.product_mrp', $item->product?->mrp ?? ($item->selling_price ?: $item->unit_price)) }},
+                                discount: {{ $initialDiscount }},
                             },
                         @endforeach
                     ],
+                    openPriceModal(index) {
+                        this.priceModal = {
+                            index,
+                            product: this.items[index].product,
+                            sku: this.items[index].sku,
+                            value: this.items[index].productMrp,
+                            discount: this.items[index].discount,
+                        };
+                        this.$dispatch('open-modal', { name: 'receive-product-price-modal' });
+                    },
+                    updateProductPrice() {
+                        if (this.priceModal.index !== null) {
+                            const item = this.items[this.priceModal.index];
+                            const newMrp = parseInt(this.priceModal.value) || 0;
+                            const discount = parseFloat(item.discount) || 0;
+
+                            item.productMrp = newMrp;
+                            item.mrp = newMrp;
+                            item.unitPrice = Math.round(newMrp * (1 - (discount / 100)));
+                        }
+                        this.$dispatch('close-modal', { name: 'receive-product-price-modal' });
+                    },
                     lineTotal(item) {
                         return (parseInt(item.received) || 0) * (parseInt(item.unitPrice) || 0);
+                    },
+                    discountPercent(item) {
+                        return (parseFloat(item.discount) || 0).toFixed(2) + '%';
                     },
                     get total() {
                         return this.items.reduce((sum, item) => sum + this.lineTotal(item), 0);
@@ -186,10 +226,27 @@
                                             <input type="date" name="items[{{ $item->id }}][expiry_date]" value="{{ old('items.'.$item->id.'.expiry_date', $item->expiry_date?->format('Y-m-d')) }}" class="w-36 rounded-md border-gray-300 text-sm">
                                             <x-input-error :messages="$errors->get('items.'.$item->id.'.expiry_date')" class="mt-1" />
                                         </td>
-                                        <td class="px-4 py-3 text-right text-sm">{{ format_money($mrp) }}</td>
-                                        <td class="px-4 py-3 text-center text-sm">{{ number_format($discount, 2) }}%</td>
-                                        <td class="px-4 py-3 text-right text-sm">{{ format_money($item->unit_price) }}</td>
-                                        <td class="px-4 py-3 text-right text-sm font-semibold" x-text="window.formatMoney(lineTotal(items[{{ $loop->index }}]))"></td>
+                                        <td class="px-4 py-3 text-right text-sm font-semibold">
+                                            <span x-text="window.formatMoney(items[{{ $loop->index }}].productMrp)"></span>
+                                            <input type="hidden" name="items[{{ $item->id }}][product_mrp]" x-model="items[{{ $loop->index }}].productMrp">
+                                            <input type="hidden" name="items[{{ $item->id }}][unit_price]" x-model="items[{{ $loop->index }}].unitPrice">
+                                            <input type="hidden" name="items[{{ $item->id }}][selling_price]" x-model="items[{{ $loop->index }}].productMrp">
+                                        </td>
+                                        <td class="px-4 py-3 text-center text-sm" x-text="discountPercent(items[{{ $loop->index }}])"></td>
+                                        <td class="px-4 py-3 text-right text-sm" x-text="window.formatMoney(items[{{ $loop->index }}].unitPrice)"></td>
+                                        <td class="px-4 py-3 text-right">
+                                            <div class="flex items-center justify-end gap-2">
+                                                <span class="text-sm font-semibold" x-text="window.formatMoney(lineTotal(items[{{ $loop->index }}]))"></span>
+                                                <button
+                                                    type="button"
+                                                    class="inline-flex h-8 w-8 items-center justify-center rounded-md bg-amber-500 text-white hover:bg-amber-600"
+                                                    title="{{ __('Update Product MRP') }}"
+                                                    x-on:click="openPriceModal({{ $loop->index }})"
+                                                >
+                                                    <x-heroicon-o-currency-rupee class="h-4 w-4" />
+                                                </button>
+                                            </div>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -202,6 +259,55 @@
                         </table>
                     </div>
                 </div>
+
+                <x-modal name="receive-product-price-modal" maxWidth="md" :close-on-outside="false" :close-on-escape="false">
+                    <div class="space-y-5 p-6">
+                        <div class="flex items-start justify-between gap-4 border-b border-gray-100 pb-4">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900">{{ __('Update Product MRP') }}</h3>
+                                <p class="mt-1 text-sm font-medium text-gray-700" x-text="priceModal.product"></p>
+                                <p class="mt-0.5 text-xs text-gray-500" x-text="priceModal.sku"></p>
+                                <p class="mt-2 inline-flex rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700">
+                                    {{ __('Discount') }}: <span class="ml-1" x-text="(parseFloat(priceModal.discount) || 0).toFixed(2) + '%'"></span>
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                x-on:click="$dispatch('close-modal', { name: 'receive-product-price-modal' })"
+                                class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-600 hover:bg-gray-50"
+                            >
+                                <x-heroicon-o-x-mark class="h-4 w-4" />
+                            </button>
+                        </div>
+
+                        <div class="space-y-2">
+                            <x-input-label for="receive_product_mrp" :value="__('Product MRP')" hint="This updates the main product page MRP and records price history. Example: 1299." />
+                            <div class="flex items-center gap-3">
+                                <x-text-input id="receive_product_mrp" type="number" min="0" x-model="priceModal.value" class="text-lg font-bold" />
+                                <span class="text-lg font-bold text-gray-900">{{ __('INR') }}</span>
+                            </div>
+                            <p class="text-xs font-semibold text-gray-600">
+                                {{ __('Calculated Net Price') }}:
+                                <span class="text-gray-900" x-text="window.formatMoney(Math.round((parseInt(priceModal.value) || 0) * (1 - ((parseFloat(priceModal.discount) || 0) / 100))))"></span>
+                            </p>
+                        </div>
+
+                        <div class="flex items-center justify-end gap-3 border-t border-gray-100 pt-5">
+                            <button type="button" x-on:click="$dispatch('close-modal', { name: 'receive-product-price-modal' })" class="inline-flex h-10 items-center justify-center rounded-md border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+                                {{ __('Cancel') }}
+                            </button>
+                            <button
+                                type="button"
+                                x-on:click="updateProductPrice()"
+                                class="inline-flex h-10 items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold shadow-sm"
+                                style="display:flex !important; visibility:visible !important; opacity:1 !important; background-color:#059669 !important; color:#ffffff !important; border:1px solid #047857 !important;"
+                            >
+                                <x-heroicon-o-check class="h-4 w-4" />
+                                {{ __('Update Price') }}
+                            </button>
+                        </div>
+                    </div>
+                </x-modal>
 
                 <div class="flex items-center justify-end gap-3 border-t border-gray-200 pt-6">
                     <a href="{{ route('purchases.show', $purchase) }}" class="inline-flex h-10 items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">

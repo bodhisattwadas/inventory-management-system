@@ -87,6 +87,8 @@
                         <p class="text-sm text-foreground font-medium">{{ $product->updated_at?->format('d M Y, H:i') ?? '-' }}</p>
                     </div>
                 </div>
+
+                @include('products.partials.price-history', ['product' => $product])
             </div>
 
             <!-- Actions -->
