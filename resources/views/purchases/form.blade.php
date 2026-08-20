@@ -147,14 +147,18 @@
 <script>
     document.addEventListener('alpine:init', () => {
         Alpine.data('purchaseForm', (initialData) => ({
+            money(value) {
+                return Number((parseFloat(value) || 0).toFixed(2));
+            },
             items: (initialData.items || []).map(i => ({
                 ...i,
                 key: i.key || Math.random().toString(36).slice(2),
-                mrp: parseInt(i.mrp || i.selling_price || 0),
-                discount_percent: i.discount_percent ?? ((parseInt(i.mrp || i.selling_price || 0) > 0)
-                    ? Math.max(0, Math.min(100, Number((100 - ((parseInt(i.unit_price) || 0) / parseInt(i.mrp || i.selling_price || 0) * 100)).toFixed(2))))
+                mrp: Number(parseFloat(i.mrp || i.selling_price || 0).toFixed(2)),
+                discount_percent: i.discount_percent ?? ((parseFloat(i.mrp || i.selling_price || 0) > 0)
+                    ? Math.max(0, Math.min(100, Number((100 - ((parseFloat(i.unit_price) || 0) / parseFloat(i.mrp || i.selling_price || 0) * 100)).toFixed(4))))
                     : 0),
-                subtotal: parseInt(i.subtotal) || ((parseInt(i.quantity) || 0) * (parseInt(i.unit_price) || 0))
+                unit_price: Number(parseFloat(i.unit_price || 0).toFixed(2)),
+                subtotal: Number(parseFloat(i.subtotal || ((parseInt(i.quantity) || 0) * (parseFloat(i.unit_price) || 0))).toFixed(2))
             })),
             supplier_id: initialData.supplier_id || '',
             company_id: initialData.company_id || '',
@@ -177,12 +181,12 @@
             calculateLine(index) {
                 const item = this.items[index];
                 item.discount_percent = Math.max(0, Math.min(100, parseFloat(item.discount_percent) || 0));
-                item.unit_price = Math.round((parseInt(item.mrp) || 0) * (1 - item.discount_percent / 100));
-                item.subtotal = (parseInt(item.quantity) || 0) * (parseInt(item.unit_price) || 0);
+                item.unit_price = this.money((parseFloat(item.mrp) || 0) * (1 - item.discount_percent / 100));
+                item.subtotal = this.money((parseInt(item.quantity) || 0) * (parseFloat(item.unit_price) || 0));
             },
 
             get total() {
-                return this.items.reduce((sum, item) => sum + (parseInt(item.subtotal) || 0), 0);
+                return this.money(this.items.reduce((sum, item) => sum + (parseFloat(item.subtotal) || 0), 0));
             },
 
             waitForTomSelect(callback) {
@@ -302,14 +306,14 @@
                     return;
                 }
 
-                const price = parseInt(product.price || product.mrp || 0);
+                const price = this.money(product.price || product.mrp || 0);
                 this.items.push({
                     key: Math.random().toString(36).slice(2),
                     product_id: product.value,
                     product_name: product.text,
                     product_code: product.sku,
                     brand: product.brand,
-                    mrp: parseInt(product.mrp || price || 0),
+                    mrp: this.money(product.mrp || price || 0),
                     discount_percent: 0,
                     quantity: 1,
                     unit_price: price,

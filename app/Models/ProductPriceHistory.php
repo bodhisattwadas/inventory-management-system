@@ -20,8 +20,8 @@ class ProductPriceHistory extends Model
     protected $casts = [
         'product_id' => 'integer',
         'changed_by' => 'integer',
-        'old_mrp' => 'integer',
-        'new_mrp' => 'integer',
+        'old_mrp' => 'decimal:2',
+        'new_mrp' => 'decimal:2',
     ];
 
     public function product(): BelongsTo

@@ -11,8 +11,8 @@ class VendorInvoiceService
 {
     public function createFromPurchase(Purchase $purchase, ?string $invoiceNumber, ?string $documentPath, ?string $orderReceivedDate = null): VendorInvoice
     {
-        $amount = (int) $purchase->items->sum(function ($item) {
-            return ((int) ($item->received_quantity ?? $item->quantity)) * ((int) $item->unit_price);
+        $amount = $purchase->items->sum(function ($item) {
+            return ((int) ($item->received_quantity ?? $item->quantity)) * ((float) $item->unit_price);
         });
 
         return VendorInvoice::updateOrCreate(
@@ -37,9 +37,9 @@ class VendorInvoiceService
             return;
         }
 
-        $paidAmount = (int) ($paymentDetails['paid_amount'] ?? 0);
-        $newPaidAmount = min((int) $vendorInvoice->amount, (int) $vendorInvoice->paid_amount + $paidAmount);
-        $status = $newPaidAmount >= (int) $vendorInvoice->amount
+        $paidAmount = (float) ($paymentDetails['paid_amount'] ?? 0);
+        $newPaidAmount = min((float) $vendorInvoice->amount, (float) $vendorInvoice->paid_amount + $paidAmount);
+        $status = $newPaidAmount >= (float) $vendorInvoice->amount
             ? VendorInvoiceStatus::PAID
             : VendorInvoiceStatus::PARTIALLY_PAID;
 

@@ -30,9 +30,9 @@ class PurchaseItem extends Model
         'received_quantity' => 'integer',
         'manufacturing_date' => 'date',
         'expiry_date' => 'date',
-        'unit_price' => 'integer',
-        'subtotal' => 'integer',
-        'selling_price' => 'integer',
+        'unit_price' => 'decimal:2',
+        'subtotal' => 'decimal:2',
+        'selling_price' => 'decimal:2',
     ];
 
     public function purchase(): BelongsTo

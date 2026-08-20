@@ -144,11 +144,11 @@ class PurchaseService
                     ? ($item->batch_number ?: $this->generateBatchNumber(Carbon::parse($receiptDate)))
                     : null;
                 $updatedUnitPrice = isset($itemReceiptDates[$item->id]['unit_price'])
-                    ? (int) $itemReceiptDates[$item->id]['unit_price']
-                    : (int) $item->unit_price;
+                    ? (float) $itemReceiptDates[$item->id]['unit_price']
+                    : (float) $item->unit_price;
                 $updatedSellingPrice = isset($itemReceiptDates[$item->id]['selling_price'])
-                    ? (int) $itemReceiptDates[$item->id]['selling_price']
-                    : (int) $item->selling_price;
+                    ? (float) $itemReceiptDates[$item->id]['selling_price']
+                    : (float) $item->selling_price;
 
                 $item->update([
                     'received_quantity' => $receivedQuantity,
@@ -157,7 +157,7 @@ class PurchaseService
                     'expiry_date' => $itemReceiptDates[$item->id]['expiry_date'] ?? null,
                     'unit_price' => $updatedUnitPrice,
                     'selling_price' => $updatedSellingPrice,
-                    'subtotal' => ((int) $item->quantity) * $updatedUnitPrice,
+                    'subtotal' => number_format(((int) $item->quantity) * $updatedUnitPrice, 2, '.', ''),
                 ]);
                 $item->refresh();
 
@@ -174,11 +174,11 @@ class PurchaseService
                     $hasPriceChange = false;
                     $ref = $purchase->invoice_number ? "PO #{$purchase->invoice_number}" : "Purchase #{$purchase->id}";
                     $newProductMrp = isset($itemReceiptDates[$item->id]['product_mrp'])
-                        ? (int) $itemReceiptDates[$item->id]['product_mrp']
+                        ? (float) $itemReceiptDates[$item->id]['product_mrp']
                         : null;
 
-                    if ($newProductMrp !== null && (int) $product->mrp !== $newProductMrp) {
-                        $oldMrp = (int) $product->mrp;
+                    if ($newProductMrp !== null && (float) $product->mrp !== $newProductMrp) {
+                        $oldMrp = (float) $product->mrp;
                         $updateData['mrp'] = $newProductMrp;
                         $product->priceHistories()->create([
                             'changed_by' => Auth::id(),

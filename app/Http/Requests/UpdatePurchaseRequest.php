@@ -20,8 +20,8 @@ class UpdatePurchaseRequest extends FormRequest
             $discount = max(0, min(100, (float) ($item['discount_percent'] ?? 0)));
 
             if ($mrp !== null) {
-                $item['unit_price'] = (int) round($mrp * (1 - $discount / 100));
-                $item['selling_price'] = (int) $mrp;
+                $item['unit_price'] = number_format(((float) $mrp) * (1 - $discount / 100), 2, '.', '');
+                $item['selling_price'] = number_format((float) $mrp, 2, '.', '');
             }
 
             return $item;

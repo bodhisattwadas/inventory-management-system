@@ -28,7 +28,7 @@ class Purchase extends Model
     protected $casts = [
         'purchase_date' => 'date',
         'due_date' => 'date',
-        'total' => 'integer',
+        'total' => 'decimal:2',
         'supplier_id' => 'integer',
         'company_id' => 'integer',
         'created_by' => 'integer',

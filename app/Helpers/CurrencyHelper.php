@@ -14,7 +14,7 @@ if (!function_exists('format_money')) {
         // Get settings, defaulting to IDR format if not set
         $symbol = Setting::get('currency_symbol', 'Rp');
         $position = Setting::get('currency_position', 'left'); // 'left' or 'right'
-        $fractions = (int) Setting::get('currency_fraction_digits', 0);
+        $fractions = (int) Setting::get('currency_fraction_digits', 2);
         $thousand = Setting::get('currency_thousand_separator', '.');
         $decimal = Setting::get('currency_decimal_separator', ',');
         

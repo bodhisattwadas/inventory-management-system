@@ -43,8 +43,8 @@
                     items: [
                         @foreach($purchase->items as $item)
                             @php
-                                $initialMrp = (int) ($item->selling_price ?: $item->unit_price);
-                                $initialDiscount = $initialMrp > 0 ? round((1 - ((int) $item->unit_price / $initialMrp)) * 100, 2) : 0;
+                                $initialMrp = (float) ($item->selling_price ?: $item->unit_price);
+                                $initialDiscount = $initialMrp > 0 ? (1 - ((float) $item->unit_price / $initialMrp)) * 100 : 0;
                             @endphp
                             {
                                 id: {{ $item->id }},
@@ -52,10 +52,10 @@
                                 sku: @js($item->product->sku ?? $item->product->code ?? ''),
                                 ordered: {{ (int) $item->quantity }},
                                 received: {{ (int) old('items.'.$item->id.'.received_quantity', $item->received_quantity ?? $item->quantity) }},
-                                unitPrice: {{ (int) $item->unit_price }},
+                                unitPrice: {{ number_format((float) $item->unit_price, 2, '.', '') }},
                                 mrp: {{ $initialMrp }},
-                                productMrp: {{ (int) old('items.'.$item->id.'.product_mrp', $item->product?->mrp ?? ($item->selling_price ?: $item->unit_price)) }},
-                                discount: {{ $initialDiscount }},
+                                productMrp: {{ number_format((float) old('items.'.$item->id.'.product_mrp', $item->product?->mrp ?? ($item->selling_price ?: $item->unit_price)), 2, '.', '') }},
+                                discount: {{ number_format($initialDiscount, 6, '.', '') }},
                             },
                         @endforeach
                     ],
@@ -72,23 +72,23 @@
                     updateProductPrice() {
                         if (this.priceModal.index !== null) {
                             const item = this.items[this.priceModal.index];
-                            const newMrp = parseInt(this.priceModal.value) || 0;
+                            const newMrp = parseFloat(this.priceModal.value) || 0;
                             const discount = parseFloat(item.discount) || 0;
 
-                            item.productMrp = newMrp;
-                            item.mrp = newMrp;
-                            item.unitPrice = Math.round(newMrp * (1 - (discount / 100)));
+                            item.productMrp = Number(newMrp.toFixed(2));
+                            item.mrp = Number(newMrp.toFixed(2));
+                            item.unitPrice = Number((newMrp * (1 - (discount / 100))).toFixed(2));
                         }
                         this.$dispatch('close-modal', { name: 'receive-product-price-modal' });
                     },
                     lineTotal(item) {
-                        return (parseInt(item.received) || 0) * (parseInt(item.unitPrice) || 0);
+                        return Number(((parseInt(item.received) || 0) * (parseFloat(item.unitPrice) || 0)).toFixed(2));
                     },
                     discountPercent(item) {
                         return (parseFloat(item.discount) || 0).toFixed(2) + '%';
                     },
                     get total() {
-                        return this.items.reduce((sum, item) => sum + this.lineTotal(item), 0);
+                        return Number(this.items.reduce((sum, item) => sum + this.lineTotal(item), 0).toFixed(2));
                     }
                 }"
                 @submit="submitting = true"
@@ -203,10 +203,6 @@
                             </thead>
                             <tbody class="divide-y divide-gray-200 bg-white">
                                 @foreach($purchase->items as $item)
-                                    @php
-                                        $mrp = (int) ($item->selling_price ?: $item->unit_price);
-                                        $discount = $mrp > 0 ? round((1 - ((int) $item->unit_price / $mrp)) * 100, 2) : 0;
-                                    @endphp
                                     <tr>
                                         <td class="px-4 py-3">
                                             <div class="text-sm font-medium text-gray-900">{{ $item->product->name ?? '-' }}</div>
@@ -288,7 +284,7 @@
                             </div>
                             <p class="text-xs font-semibold text-gray-600">
                                 {{ __('Calculated Net Price') }}:
-                                <span class="text-gray-900" x-text="window.formatMoney(Math.round((parseInt(priceModal.value) || 0) * (1 - ((parseFloat(priceModal.discount) || 0) / 100))))"></span>
+                                <span class="text-gray-900" x-text="window.formatMoney(Number(((parseFloat(priceModal.value) || 0) * (1 - ((parseFloat(priceModal.discount) || 0) / 100))).toFixed(2)))"></span>
                             </p>
                         </div>
 

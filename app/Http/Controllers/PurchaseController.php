@@ -181,9 +181,9 @@ class PurchaseController extends Controller
             'items.*.received_quantity' => ['required', 'integer', 'min:0'],
             'items.*.manufacturing_date' => ['nullable', 'date'],
             'items.*.expiry_date' => ['nullable', 'date'],
-            'items.*.product_mrp' => ['nullable', 'integer', 'min:0'],
-            'items.*.unit_price' => ['nullable', 'integer', 'min:0'],
-            'items.*.selling_price' => ['nullable', 'integer', 'min:0'],
+            'items.*.product_mrp' => ['nullable', 'numeric', 'min:0'],
+            'items.*.unit_price' => ['nullable', 'numeric', 'min:0'],
+            'items.*.selling_price' => ['nullable', 'numeric', 'min:0'],
         ];
 
         // Only validate invoice_number if it's not already set on the purchase

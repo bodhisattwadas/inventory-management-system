@@ -1,6 +1,6 @@
 <x-app-layout title="Vendor Invoice Details">
     @php
-        $dueAmount = max(0, (int) $vendorInvoice->amount - (int) $vendorInvoice->paid_amount);
+        $dueAmount = max(0, (float) $vendorInvoice->amount - (float) $vendorInvoice->paid_amount);
     @endphp
 
     <x-slot name="header">

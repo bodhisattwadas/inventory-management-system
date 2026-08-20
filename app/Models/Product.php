@@ -29,9 +29,9 @@ class Product extends Model
     ];
 
     protected $casts = [
-        'purchase_price' => 'integer',
-        'selling_price' => 'integer',
-        'mrp' => 'integer',
+        'purchase_price' => 'decimal:2',
+        'selling_price' => 'decimal:2',
+        'mrp' => 'decimal:2',
         'quantity' => 'integer',
         'min_stock' => 'integer',
         'is_active' => 'boolean',
